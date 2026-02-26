@@ -83,8 +83,10 @@ const setupAuthListener = () => {
         console.log('🔐 Auth state changed:', user?.email || user?.uid || 'none');
         if (user && !user.isAnonymous) {
             _currentUser = user;
+            console.log('User authenticated, loading cloud data...');
             updateAuthUI(user);
             await dbLoad();
+            console.log('Cloud data load completed');
         } else if (!user) {
             _currentUser = null;
             updateAuthUI(null);
@@ -181,11 +183,11 @@ export const authAction = async () => {
             provider.addScope('email');
 
             const result = await _auth.signInWithPopup(provider);
-            console.log('Signed in as:', result.user.email);
+            console.log('✅ Signed in as:', result.user.email);
             _currentUser = result.user;
 
             // IMPORTANT: After signing in, migrate local data to their Google account
-            console.log('Migrating local data to Google account...');
+            console.log('🔄 Migrating local data to Google account...');
             const state = window._appState;
 
             // Save current local state to their Firebase account
@@ -198,14 +200,21 @@ export const authAction = async () => {
                 notes: state.notes,
                 grocery: state.grocery
             });
-            console.log('Local data migrated to Firebase ✓');
+            console.log('✓ Local data migrated to Firebase');
 
             updateAuthUI(result.user);
 
-            // Load user data from cloud (in case there was existing data)
+            // Load user data from cloud
             await dbLoad();
+
+            // Force render to update UI with cloud data
+            if (window._render) {
+                window._render();
+                console.log('✓ UI refreshed with synced data');
+            }
+
             setAuthLoading(false);
-            toast('Signed in! ✓ Data synced');
+            toast('✓ Signed in! Data synced');
         } catch (err) {
             console.error('Sign-in error code:', err.code);
             console.error('Sign-in error message:', err.message);
@@ -264,7 +273,7 @@ export const dbLoad = async () => {
 
     try {
         _isLoadingFromFirebase = true;
-        console.log('Loading data from Firebase for user:', _currentUser.uid);
+        console.log('📥 Loading data from Firebase for user:', _currentUser.uid);
 
         const snap = await _db.collection('users').doc(_currentUser.uid).get();
 
@@ -272,7 +281,7 @@ export const dbLoad = async () => {
             const d = snap.data();
             const state = window._appState;
 
-            console.log('✓ Cloud data found:', {
+            console.log('📊 Cloud data found:', {
                 notes: d.notes?.length || 0,
                 todos: d.todos?.length || 0,
                 grocery: d.grocery?.length || 0,
@@ -283,6 +292,7 @@ export const dbLoad = async () => {
             if (d.habits !== undefined) {
                 state.habits = d.habits;
                 localStorage.setItem('h2', JSON.stringify(d.habits));
+                console.log('✓ Loaded habits:', d.habits.length);
             }
             if (d.hlog !== undefined) {
                 state.hlog = d.hlog;
@@ -291,6 +301,7 @@ export const dbLoad = async () => {
             if (d.todos !== undefined) {
                 state.todos = d.todos;
                 localStorage.setItem('t2', JSON.stringify(d.todos));
+                console.log('✓ Loaded todos:', d.todos.length);
             }
             if (d.calEvents !== undefined) {
                 state.calEvents = d.calEvents;
@@ -303,24 +314,30 @@ export const dbLoad = async () => {
             if (d.notes !== undefined) {
                 state.notes = d.notes;
                 localStorage.setItem('nt2', JSON.stringify(d.notes));
+                console.log('✓ Loaded notes:', d.notes.length);
             }
             if (d.grocery !== undefined) {
                 state.grocery = d.grocery;
                 localStorage.setItem('gr2', JSON.stringify(d.grocery));
+                console.log('✓ Loaded grocery:', d.grocery.length);
             }
 
-            // Re-render with loaded data
+            // Force re-render with loaded data
             if (window._render) {
+                console.log('🔄 Refreshing UI...');
                 window._render();
-                console.log('✓ UI re-rendered with cloud data');
+                console.log('✓ UI refreshed with cloud data');
+            } else {
+                console.warn('⚠️ window._render not available yet');
             }
         } else {
             console.log('No cloud data found for user, creating new document');
             // First-time user: save current state to Firebase
+            await new Promise(resolve => setTimeout(resolve, 500));
             dbSave();
         }
     } catch (e) {
-        console.error('Firestore load error:', e);
+        console.error('❌ Firestore load error:', e);
     } finally {
         _isLoadingFromFirebase = false;
     }
