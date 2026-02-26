@@ -87,6 +87,11 @@ export const updateAuthUI = user => {
         label.textContent = user.displayName || user.email || 'Signed in';
         btn.title = 'Click to sign out';
     }
+
+    // Update settings UI when auth state changes
+    if (window._settings) {
+        window._settings.updateUI();
+    }
 };
 
 export const setAuthLoading = (show, msg) => {

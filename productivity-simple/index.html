@@ -369,7 +369,10 @@
               <h4>Appearance</h4>
               <div class="settings-row">
                 <span>Dark mode</span>
-                <button class="dark-btn-settings" onclick="window._darkMode?.toggle?.()">
+                <button
+                  class="dark-btn-settings"
+                  onclick="window._darkMode?.toggle?.()"
+                >
                   <span id="dm-toggle">🌙 Off</span>
                 </button>
               </div>
@@ -379,27 +382,52 @@
               <h4>Account</h4>
               <div class="settings-row">
                 <span>Current user</span>
-                <span id="settings-user" style="font-weight: 600; color: var(--primary)">Not signed in</span>
+                <span
+                  id="settings-user"
+                  style="font-weight: 600; color: var(--primary)"
+                  >Not signed in</span
+                >
               </div>
-              <button class="btn btn-p" style="width: 100%; margin-top: 12px" onclick="window._auth?.action?.()">
+              <button
+                class="btn btn-p"
+                style="width: 100%; margin-top: 12px"
+                onclick="window._auth?.action?.()"
+              >
                 <span id="settings-auth-btn">Sign in with Google</span>
               </button>
             </div>
 
             <div class="card">
               <h4>Data</h4>
-              <button class="btn btn-g" style="width: 100%; margin-bottom: 8px" onclick="window._settings?.exportData?.()">
+              <button
+                class="btn btn-g"
+                style="width: 100%; margin-bottom: 8px"
+                onclick="window._settings?.exportData?.()"
+              >
                 📥 Export Data (JSON)
               </button>
-              <button class="btn btn-g" style="width: 100%" onclick="window._settings?.importData?.()">
+              <button
+                class="btn btn-g"
+                style="width: 100%"
+                onclick="window._settings?.importData?.()"
+              >
                 📤 Import Data (JSON)
               </button>
-              <input type="file" id="import-file" accept=".json" style="display: none" />
+              <input
+                type="file"
+                id="import-file"
+                accept=".json"
+                style="display: none"
+              />
             </div>
 
             <div class="card">
               <h4>Support</h4>
-              <button class="btn btn-g" style="width: 100%" onclick="window._utils?.openModal?.('contact')">
+              <button
+                class="btn btn-g"
+                style="width: 100%"
+                onclick="window._utils?.openModal?.('contact')"
+              >
                 🐛 Report a bug
               </button>
             </div>
@@ -412,47 +440,82 @@
           <div class="qa-content">
             <details class="qa-item">
               <summary>How do I create a new habit?</summary>
-              <p>Click the <strong>+</strong> button at the bottom right, then fill in the habit name and choose a color. Your habit will appear in the Habits section where you can mark daily streaks.</p>
+              <p>
+                Click the <strong>+</strong> button at the bottom right, then
+                fill in the habit name and choose a color. Your habit will
+                appear in the Habits section where you can mark daily streaks.
+              </p>
             </details>
 
             <details class="qa-item">
               <summary>Is my data safe in the cloud?</summary>
-              <p>Yes! Your data is encrypted and stored securely in Google Firebase. It's only accessible when you're signed in with your Google account. You can also export your data anytime in Settings.</p>
+              <p>
+                Yes! Your data is encrypted and stored securely in Google
+                Firebase. It's only accessible when you're signed in with your
+                Google account. You can also export your data anytime in
+                Settings.
+              </p>
             </details>
 
             <details class="qa-item">
               <summary>Why don't I see my data on another device?</summary>
-              <p>Make sure you're signed in with the same Google account on both devices. Data syncs automatically when you're online. If it doesn't appear, try signing out and back in.</p>
+              <p>
+                Make sure you're signed in with the same Google account on both
+                devices. Data syncs automatically when you're online. If it
+                doesn't appear, try signing out and back in.
+              </p>
             </details>
 
             <details class="qa-item">
               <summary>Can I delete my account and data?</summary>
-              <p>Currently, you can sign out, which doesn't delete your cloud data. To permanently delete all data, please contact us using the bug report form with "Delete my account" in the message.</p>
+              <p>
+                Currently, you can sign out, which doesn't delete your cloud
+                data. To permanently delete all data, please contact us using
+                the bug report form with "Delete my account" in the message.
+              </p>
             </details>
 
             <details class="qa-item">
               <summary>What is the Pomodoro timer?</summary>
-              <p>The Pomodoro technique breaks work into 25-minute focus sessions with short breaks in between. You can customize the duration in the Pomodoro section under "Settings".</p>
+              <p>
+                The Pomodoro technique breaks work into 25-minute focus sessions
+                with short breaks in between. You can customize the duration in
+                the Pomodoro section under "Settings".
+              </p>
             </details>
 
             <details class="qa-item">
               <summary>How do I sync expenses across devices?</summary>
-              <p>Expenses are synced automatically when you're signed in. Make sure you're using the same Google account on all your devices.</p>
+              <p>
+                Expenses are synced automatically when you're signed in. Make
+                sure you're using the same Google account on all your devices.
+              </p>
             </details>
 
             <details class="qa-item">
               <summary>Can I export my data?</summary>
-              <p>Yes! Go to Settings and click "Export Data (JSON)". This downloads all your data as a JSON file. You can also import it back anytime.</p>
+              <p>
+                Yes! Go to Settings and click "Export Data (JSON)". This
+                downloads all your data as a JSON file. You can also import it
+                back anytime.
+              </p>
             </details>
 
             <details class="qa-item">
               <summary>Is there an offline mode?</summary>
-              <p>Yes! All features work offline using your device's local storage. Changes sync to the cloud when you go back online.</p>
+              <p>
+                Yes! All features work offline using your device's local
+                storage. Changes sync to the cloud when you go back online.
+              </p>
             </details>
 
             <details class="qa-item">
               <summary>How do I contact support?</summary>
-              <p>You can report bugs or ask questions using the bug report form (accessible in Settings). We'll get back to you as soon as possible.</p>
+              <p>
+                You can report bugs or ask questions using the bug report form
+                (accessible in Settings). We'll get back to you as soon as
+                possible.
+              </p>
             </details>
           </div>
         </div>
@@ -646,6 +709,70 @@
             Add to list
           </button>
         </div>
+      </div>
+    </div>
+
+    <!-- CONTACT FORM MODAL -->
+    <div id="contact" class="mbk">
+      <div class="modal">
+        <h3>Report a Bug or Contact Us</h3>
+        <form id="contact-form" class="contact-form">
+          <div class="f">
+            <label>Your Email</label>
+            <input
+              type="email"
+              name="email"
+              id="contact-email"
+              placeholder="your@email.com"
+              required
+            />
+          </div>
+          <div class="f">
+            <label>Subject</label>
+            <select name="subject" required>
+              <option value="">Select a category...</option>
+              <option value="Bug Report">🐛 Bug Report</option>
+              <option value="Feature Request">💡 Feature Request</option>
+              <option value="Data Issue">📊 Data/Sync Issue</option>
+              <option value="Performance">⚡ Performance Issue</option>
+              <option value="General Feedback">📝 General Feedback</option>
+              <option value="Other">❓ Other</option>
+            </select>
+          </div>
+          <div class="f">
+            <label>Message</label>
+            <textarea
+              name="message"
+              id="contact-message"
+              placeholder="Please describe the issue or suggestion..."
+              rows="6"
+              style="resize: vertical"
+              required
+            ></textarea>
+          </div>
+          <div class="f">
+            <label>App Version</label>
+            <input
+              type="text"
+              name="version"
+              id="contact-version"
+              placeholder="e.g., v1.0"
+              readonly
+            />
+          </div>
+          <div class="ma">
+            <button
+              type="button"
+              class="btn btn-g"
+              onclick="window._utils?.closeModal?.()"
+            >
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-p" id="submit-contact">
+              Send Report
+            </button>
+          </div>
+        </form>
       </div>
     </div>
 

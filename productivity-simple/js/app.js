@@ -890,6 +890,173 @@ byId('gname').addEventListener('keydown', e => {
 });
 
 // ══════════════════════════════════════════════════════════
+// SETTINGS MODULE
+// ══════════════════════════════════════════════════════════
+
+const settings = {
+    updateUI() {
+        const user = getCurrentUser();
+        const userDisplay = byId('settings-user');
+        const authBtn = byId('settings-auth-btn');
+
+        if (user && !user.isAnonymous) {
+            userDisplay.textContent = user.displayName || user.email || 'Signed in';
+            authBtn.textContent = '🚪 Sign out';
+        } else {
+            userDisplay.textContent = 'Not signed in';
+            authBtn.textContent = '📧 Sign in with Google';
+        }
+
+        // Update dark mode toggle
+        const dmToggle = byId('dm-toggle');
+        if (dmToggle) {
+            dmToggle.textContent = window._appState.dark ? '✅ On' : '🌙 Off';
+        }
+
+        // Set version
+        const versionInput = byId('contact-version');
+        if (versionInput) {
+            versionInput.value = 'v1.0 (2026)';
+        }
+    },
+
+    exportData() {
+        const state = window._appState;
+        const dataToExport = {
+            habits: state.habits,
+            hlog: state.hlog,
+            todos: state.todos,
+            calEvents: state.calEvents,
+            expenses: state.expenses,
+            notes: state.notes,
+            grocery: state.grocery,
+            exportDate: new Date().toISOString()
+        };
+
+        const blob = new Blob([JSON.stringify(dataToExport, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `focus-data-${new Date().toISOString().split('T')[0]}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        toast('📥 Data exported successfully!');
+    },
+
+    importData() {
+        const input = byId('import-file');
+        input.click();
+    }
+};
+
+// Handle file import
+byId('import-file')?.addEventListener('change', function (e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function (event) {
+        try {
+            const data = JSON.parse(event.target.result);
+            const state = window._appState;
+
+            // Import data
+            if (data.habits) state.habits = data.habits;
+            if (data.hlog) state.hlog = data.hlog;
+            if (data.todos) state.todos = data.todos;
+            if (data.calEvents) state.calEvents = data.calEvents;
+            if (data.expenses) state.expenses = data.expenses;
+            if (data.notes) state.notes = data.notes;
+            if (data.grocery) state.grocery = data.grocery;
+
+            // Save to localStorage
+            S.set('h2', state.habits);
+            S.set('hl2', state.hlog);
+            S.set('t2', state.todos);
+            S.set('ev2', state.calEvents);
+            S.set('ex2', state.expenses);
+            S.set('nt2', state.notes);
+            S.set('gr2', state.grocery);
+
+            // Refresh UI
+            window._render?.();
+            toast('📤 Data imported successfully!');
+        } catch (err) {
+            toast('❌ Invalid file format');
+        }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+});
+
+// ══════════════════════════════════════════════════════════
+// CONTACT FORM MODULE
+// ══════════════════════════════════════════════════════════
+
+const contactForm = {
+    submit(e) {
+        e.preventDefault();
+
+        const form = byId('contact-form');
+        const email = byId('contact-email').value.trim();
+        const subject = form.subject.value;
+        const message = byId('contact-message').value.trim();
+
+        if (!email || !subject || !message) {
+            toast('❌ Please fill in all fields');
+            return;
+        }
+
+        // Prepare the email
+        const emailBody = `
+Subject: ${subject}
+
+From: ${email}
+
+Message:
+${message}
+
+---
+App Version: ${byId('contact-version').value}
+Sent: ${new Date().toLocaleString()}
+        `.trim();
+
+        // Use FormSubmit.co to send email
+        const formData = new FormData();
+        formData.append('email', email);
+        formData.append('subject', subject);
+        formData.append('message', message);
+        formData.append('version', byId('contact-version').value);
+        formData.append('_captcha', 'false');
+        formData.append('_next', window.location.href);
+
+        // Send to FormSubmit.co
+        fetch('https://formspree.io/f/myzojlwp', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => {
+                if (response.ok) {
+                    toast('✅ Report sent! Thank you for your feedback.');
+                    form.reset();
+                    closeModal('contact');
+                } else {
+                    toast('❌ Failed to send. Please try again.');
+                }
+            })
+            .catch(err => {
+                console.error('Email send error:', err);
+                toast('❌ Network error. Please try again.');
+            });
+    }
+};
+
+// Initialize contact form handler
+byId('contact-form')?.addEventListener('submit', (e) => contactForm.submit(e));
+
+// ══════════════════════════════════════════════════════════
 // INITIALIZATION
 // ══════════════════════════════════════════════════════════
 
@@ -897,5 +1064,10 @@ renderSwatches();
 pomSetMode('work');
 byId('note-editor').style.display = 'none';
 darkMode.apply();
+settings.updateUI();
 initFirebase();
+
+// Expose modules to window for HTML onclick handlers
+window._settings = settings;
+window._contactForm = contactForm;
 render();
