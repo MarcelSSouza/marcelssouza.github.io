@@ -125,44 +125,48 @@ export const authAction = () => {
         setAuthLoading(true, 'Opening Google sign-in…');
         const provider = new firebase.auth.GoogleAuthProvider();
 
-        // Use redirect on mobile, popup on desktop
-        if (isMobile()) {
-            // Mobile: use redirect flow
-            _auth.currentUser.linkWithRedirect(provider)
-                .catch(e => {
-                    // If link fails, try regular signin
-                    if (e.code === 'auth/credential-already-in-use') {
-                        _auth.signInWithRedirect(provider);
-                    } else {
-                        setAuthLoading(false);
-                        console.error('Mobile auth error:', e);
-                        toast('Sign-in failed ❌');
-                    }
-                });
-        } else {
-            // Desktop: use popup flow (original behavior)
-            _auth.currentUser.linkWithPopup(provider)
-                .then(() => {
+        // Try to sign in with popup first (works on most cases)
+        _auth.signInWithPopup(provider)
+            .then(() => {
+                setAuthLoading(false);
+                toast('Signed in! Data is now synced 🎉');
+            })
+            .catch(e => {
+                console.warn('Popup auth failed, trying redirect...', e.code);
+
+                // If popup fails (blocked by private mode, mobile, etc), try redirect
+                if (e.code === 'auth/popup-closed-by-user') {
                     setAuthLoading(false);
-                    toast('Signed in! Data is now synced 🎉');
-                })
-                .catch(e => {
-                    if (e.code === 'auth/credential-already-in-use') {
-                        _auth.signInWithPopup(provider)
-                            .then(() => {
-                                setAuthLoading(false);
-                                toast('Signed in ✅');
-                            })
-                            .catch(() => {
-                                setAuthLoading(false);
-                                toast('Sign-in failed ❌');
-                            });
-                    } else {
-                        setAuthLoading(false);
-                        if (e.code !== 'auth/popup-closed-by-user') toast('Sign-in failed ❌');
-                    }
-                });
-        }
+                    return;
+                }
+
+                if (e.code === 'auth/popup-blocked' ||
+                    e.code === 'auth/network-request-failed' ||
+                    e.message?.includes('popup') ||
+                    e.message?.includes('blocked')) {
+                    // Popup was blocked (likely private mode) - try redirect
+                    _auth.signInWithRedirect(provider)
+                        .catch(redirectError => {
+                            setAuthLoading(false);
+                            console.error('All auth methods failed:', redirectError);
+                            toast('⚠️ Sign-in blocked (try normal mode)\nIf in private mode, disable it and try again');
+                        });
+                } else if (e.code === 'auth/credential-already-in-use') {
+                    // User already exists with different provider
+                    _auth.signInWithPopup(provider)
+                        .then(() => {
+                            setAuthLoading(false);
+                            toast('Signed in ✅');
+                        })
+                        .catch(err => {
+                            setAuthLoading(false);
+                            toast('Sign-in failed ❌');
+                        });
+                } else {
+                    setAuthLoading(false);
+                    toast('🔐 Sign-in failed. Try disabling private mode');
+                }
+            });
     } else {
         if (!confirm('Sign out? Your data stays in the cloud.')) return;
         setAuthLoading(true, 'Signing out…');
