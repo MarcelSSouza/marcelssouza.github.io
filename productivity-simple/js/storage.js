@@ -41,13 +41,21 @@ const isMobile = () => {
 
 export const initFirebase = () => {
     if (typeof firebase === 'undefined') {
-        console.warn('Firebase library not loaded yet');
-        // Try again in a moment
-        setTimeout(initFirebase, 500);
+        console.warn('Firebase library not loaded yet, retrying...');
+        setTimeout(initFirebase, 1000);
         return;
     }
 
     try {
+        // Check if Firebase is already initialized
+        if (firebase.apps.length) {
+            console.log('Firebase already initialized');
+            _auth = firebase.auth();
+            _db = firebase.firestore();
+            setupAuthListener();
+            return;
+        }
+
         const fbApp = firebase.initializeApp({
             apiKey: "AIzaSyC5r6j4k3Nxduv4V4fEzjRrcV3_y3ohkrQ",
             authDomain: "focus-81bf0.firebaseapp.com",
@@ -60,23 +68,26 @@ export const initFirebase = () => {
         _db = firebase.firestore();
         _auth = firebase.auth();
 
-        console.log('Firebase initialized successfully');
-
-        _auth.onAuthStateChanged(async function (user) {
-            console.log('Auth state changed:', user?.email || 'anonymous');
-            if (user) {
-                _currentUser = user;
-                updateAuthUI(user);
-                await dbLoad();
-            } else {
-                _auth.signInAnonymously().catch(e => {
-                    console.warn('Anonymous sign-in failed:', e);
-                });
-            }
-        });
+        console.log('✓ Firebase initialized');
+        setupAuthListener();
     } catch (e) {
         console.error('Firebase init error:', e);
     }
+};
+
+const setupAuthListener = () => {
+    _auth.onAuthStateChanged(async (user) => {
+        console.log('🔐 Auth state changed:', user?.email || user?.uid || 'none');
+        if (user && !user.isAnonymous) {
+            _currentUser = user;
+            updateAuthUI(user);
+            await dbLoad();
+        } else if (!user) {
+            _currentUser = null;
+            updateAuthUI(null);
+            console.log('User logged out');
+        }
+    });
 };
 
 export const getCurrentUser = () => _currentUser;
@@ -92,9 +103,15 @@ export const updateAuthUI = user => {
     const label = document.getElementById('auth-label');
     const btn = document.getElementById('auth-btn');
 
+    if (!ic || !label || !btn) {
+        console.warn('Auth UI elements not found in DOM');
+        return;
+    }
+
     if (!user || user.isAnonymous) {
         ic.textContent = '👤';
         label.textContent = 'Sign in with Google';
+        btn.title = 'Click to sign in';
     } else {
         ic.innerHTML = user.photoURL
             ? `<img class="auth-avatar" src="${user.photoURL}" referrerpolicy="no-referrer"/>`
@@ -123,52 +140,62 @@ export const setAuthLoading = (show, msg) => {
     }
 };
 
-export const authAction = () => {
+export const authAction = async () => {
     const { toast } = require('./utils');
 
     if (!_auth) {
-        toast('Auth not ready. Please refresh the page');
+        toast('Auth not ready. Refreshing...');
+        setTimeout(() => window.location.reload(), 1000);
         return;
     }
 
-    if (!_currentUser || _currentUser.isAnonymous) {
-        setAuthLoading(true, 'Opening Google sign-in…');
-        const provider = new firebase.auth.GoogleAuthProvider();
-        provider.addScope('profile');
-        provider.addScope('email');
+    // Check if currently signed in with Google
+    const isSignedInWithGoogle = _currentUser && !_currentUser.isAnonymous;
 
-        // Simply try to sign in with popup
-        _auth.signInWithPopup(provider)
-            .then(async (result) => {
-                _currentUser = result.user;
-                updateAuthUI(result.user);
-                // Load user data from cloud
-                await dbLoad();
-                setAuthLoading(false);
-                toast('Signed in! Data synced 🎉');
-            })
-            .catch((e) => {
-                console.error('Sign-in error:', e);
-                setAuthLoading(false);
-
-                // Only show error if user didn't cancel
-                if (e.code !== 'auth/popup-closed-by-user') {
-                    toast('❌ Sign-in failed. Try again or check console');
-                }
-            });
-    } else {
+    if (isSignedInWithGoogle) {
+        // User wants to sign out
         if (!confirm('Sign out? Your data stays in the cloud.')) return;
-        setAuthLoading(true, 'Signing out…');
-        _auth.signOut().then(() => {
+
+        try {
+            setAuthLoading(true, 'Signing out…');
+            await _auth.signOut();
             _currentUser = null;
             setAuthLoading(false);
             updateAuthUI(null);
-            toast('Signed out');
-        }).catch(e => {
+            toast('Signed out ✓');
+        } catch (err) {
+            console.error('Sign out error:', err);
             setAuthLoading(false);
-            console.error('Sign out error:', e);
-            toast('Error signing out');
-        });
+            toast('❌ Sign out failed');
+        }
+    } else {
+        // User wants to sign in
+        try {
+            setAuthLoading(true, 'Signing in with Google…');
+            const provider = new firebase.auth.GoogleAuthProvider();
+            provider.addScope('profile');
+            provider.addScope('email');
+
+            const result = await _auth.signInWithPopup(provider);
+            console.log('Signed in as:', result.user.email);
+            _currentUser = result.user;
+            updateAuthUI(result.user);
+
+            // Load user data from cloud
+            await dbLoad();
+            setAuthLoading(false);
+            toast('Signed in! ✓ Data synced');
+        } catch (err) {
+            console.error('Sign-in error code:', err.code);
+            console.error('Sign-in error message:', err.message);
+            setAuthLoading(false);
+
+            if (err.code === 'auth/popup-closed-by-user') {
+                console.log('User closed sign-in popup');
+            } else {
+                toast('❌ Sign-in failed');
+            }
+        }
     }
 };
 
