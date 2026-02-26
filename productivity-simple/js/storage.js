@@ -3,6 +3,9 @@
  * Handles data persistence and cloud sync
  */
 
+// Import toast for notifications
+let _toast = null;
+
 let _currentUser = null;
 let _db = null;
 let _auth = null;
@@ -141,7 +144,8 @@ export const setAuthLoading = (show, msg) => {
 };
 
 export const authAction = async () => {
-    const { toast } = require('./utils');
+    // Use toast from window if available
+    const toast = window._utils?.toast || ((msg) => console.log(msg));
 
     if (!_auth) {
         toast('Auth not ready. Refreshing...');
