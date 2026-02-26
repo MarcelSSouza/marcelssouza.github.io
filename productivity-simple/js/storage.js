@@ -183,9 +183,26 @@ export const authAction = async () => {
             const result = await _auth.signInWithPopup(provider);
             console.log('Signed in as:', result.user.email);
             _currentUser = result.user;
+
+            // IMPORTANT: After signing in, migrate local data to their Google account
+            console.log('Migrating local data to Google account...');
+            const state = window._appState;
+
+            // Save current local state to their Firebase account
+            await _db.collection('users').doc(_currentUser.uid).set({
+                habits: state.habits,
+                hlog: state.hlog,
+                todos: state.todos,
+                calEvents: state.calEvents,
+                expenses: state.expenses,
+                notes: state.notes,
+                grocery: state.grocery
+            });
+            console.log('Local data migrated to Firebase ✓');
+
             updateAuthUI(result.user);
 
-            // Load user data from cloud
+            // Load user data from cloud (in case there was existing data)
             await dbLoad();
             setAuthLoading(false);
             toast('Signed in! ✓ Data synced');
@@ -208,11 +225,21 @@ export const authAction = async () => {
 // ──────────────────────────────────────────────────────────
 
 export const dbSave = () => {
-    if (!_currentUser || !_db) return;
+    if (!_currentUser || !_db) {
+        console.log('dbSave skipped: user or db not ready');
+        return;
+    }
 
     clearTimeout(_saveTimer);
     _saveTimer = setTimeout(() => {
         const state = window._appState;
+        console.log('💾 Saving to Firebase:', {
+            notes: state.notes?.length || 0,
+            todos: state.todos?.length || 0,
+            grocery: state.grocery?.length || 0,
+            habits: state.habits?.length || 0
+        });
+
         _db.collection('users').doc(_currentUser.uid).set({
             habits: state.habits,
             hlog: state.hlog,
@@ -221,20 +248,36 @@ export const dbSave = () => {
             expenses: state.expenses,
             notes: state.notes,
             grocery: state.grocery
-        }).catch(e => console.warn('Firestore save failed', e));
+        }).then(() => {
+            console.log('✓ Saved to Firebase successfully');
+        }).catch(e => {
+            console.error('Firestore save failed:', e);
+        });
     }, 800);
 };
 
 export const dbLoad = async () => {
-    if (!_currentUser || !_db) return;
+    if (!_currentUser || !_db) {
+        console.log('dbLoad skipped: user or db not ready');
+        return;
+    }
 
     try {
         _isLoadingFromFirebase = true;
+        console.log('Loading data from Firebase for user:', _currentUser.uid);
+
         const snap = await _db.collection('users').doc(_currentUser.uid).get();
 
         if (snap.exists) {
             const d = snap.data();
             const state = window._appState;
+
+            console.log('✓ Cloud data found:', {
+                notes: d.notes?.length || 0,
+                todos: d.todos?.length || 0,
+                grocery: d.grocery?.length || 0,
+                habits: d.habits?.length || 0
+            });
 
             // Load all data from Firebase into state and localStorage
             if (d.habits !== undefined) {
@@ -267,13 +310,17 @@ export const dbLoad = async () => {
             }
 
             // Re-render with loaded data
-            if (window._render) window._render();
+            if (window._render) {
+                window._render();
+                console.log('✓ UI re-rendered with cloud data');
+            }
         } else {
+            console.log('No cloud data found for user, creating new document');
             // First-time user: save current state to Firebase
             dbSave();
         }
     } catch (e) {
-        console.warn('Firestore load failed', e);
+        console.error('Firestore load error:', e);
     } finally {
         _isLoadingFromFirebase = false;
     }
