@@ -11,6 +11,7 @@ let _db = null;
 let _auth = null;
 let _saveTimer = null;
 let _isLoadingFromFirebase = false;
+let _firestoreListener = null; // Real-time listener
 
 // ──────────────────────────────────────────────────────────
 // Storage Abstraction
@@ -83,12 +84,18 @@ const setupAuthListener = () => {
         console.log('🔐 Auth state changed:', user?.email || user?.uid || 'none');
         if (user && !user.isAnonymous) {
             _currentUser = user;
-            console.log('User authenticated, loading cloud data...');
+            console.log('User authenticated, setting up real-time sync...');
             updateAuthUI(user);
-            await dbLoad();
-            console.log('Cloud data load completed');
+            await dbLoad(); // This now sets up real-time listener
+            console.log('Real-time sync activated');
         } else if (!user) {
             _currentUser = null;
+            // Stop real-time listener when logging out
+            if (_firestoreListener) {
+                console.log('Stopping Firestore listener on logout');
+                _firestoreListener();
+                _firestoreListener = null;
+            }
             updateAuthUI(null);
             console.log('User logged out');
         }
@@ -272,73 +279,79 @@ export const dbLoad = async () => {
     }
 
     try {
-        _isLoadingFromFirebase = true;
-        console.log('📥 Loading data from Firebase for user:', _currentUser.uid);
-
-        const snap = await _db.collection('users').doc(_currentUser.uid).get();
-
-        if (snap.exists) {
-            const d = snap.data();
-            const state = window._appState;
-
-            console.log('📊 Cloud data found:', {
-                notes: d.notes?.length || 0,
-                todos: d.todos?.length || 0,
-                grocery: d.grocery?.length || 0,
-                habits: d.habits?.length || 0
-            });
-
-            // Load all data from Firebase into state and localStorage
-            if (d.habits !== undefined) {
-                state.habits = d.habits;
-                localStorage.setItem('h2', JSON.stringify(d.habits));
-                console.log('✓ Loaded habits:', d.habits.length);
-            }
-            if (d.hlog !== undefined) {
-                state.hlog = d.hlog;
-                localStorage.setItem('hl2', JSON.stringify(d.hlog));
-            }
-            if (d.todos !== undefined) {
-                state.todos = d.todos;
-                localStorage.setItem('t2', JSON.stringify(d.todos));
-                console.log('✓ Loaded todos:', d.todos.length);
-            }
-            if (d.calEvents !== undefined) {
-                state.calEvents = d.calEvents;
-                localStorage.setItem('ev2', JSON.stringify(d.calEvents));
-            }
-            if (d.expenses !== undefined) {
-                state.expenses = d.expenses;
-                localStorage.setItem('ex2', JSON.stringify(d.expenses));
-            }
-            if (d.notes !== undefined) {
-                state.notes = d.notes;
-                localStorage.setItem('nt2', JSON.stringify(d.notes));
-                console.log('✓ Loaded notes:', d.notes.length);
-            }
-            if (d.grocery !== undefined) {
-                state.grocery = d.grocery;
-                localStorage.setItem('gr2', JSON.stringify(d.grocery));
-                console.log('✓ Loaded grocery:', d.grocery.length);
-            }
-
-            // Force re-render with loaded data
-            if (window._render) {
-                console.log('🔄 Refreshing UI...');
-                window._render();
-                console.log('✓ UI refreshed with cloud data');
-            } else {
-                console.warn('⚠️ window._render not available yet');
-            }
-        } else {
-            console.log('No cloud data found for user, creating new document');
-            // First-time user: save current state to Firebase
-            await new Promise(resolve => setTimeout(resolve, 500));
-            dbSave();
+        // Stop previous listener if it exists
+        if (_firestoreListener) {
+            console.log('Stopping previous Firestore listener');
+            _firestoreListener();
         }
+
+        console.log('📥 Setting up real-time listener for user:', _currentUser.uid);
+
+        // Set up real-time listener with onSnapshot
+        _firestoreListener = _db.collection('users').doc(_currentUser.uid).onSnapshot(
+            (snap) => {
+                if (snap.exists) {
+                    const d = snap.data();
+                    const state = window._appState;
+
+                    // Prevent infinite update loop
+                    _isLoadingFromFirebase = true;
+
+                    console.log('🔄 Real-time update received:', {
+                        notes: d.notes?.length || 0,
+                        todos: d.todos?.length || 0,
+                        grocery: d.grocery?.length || 0,
+                        habits: d.habits?.length || 0
+                    });
+
+                    // Update all data from Firebase
+                    if (d.habits !== undefined) {
+                        state.habits = d.habits;
+                        localStorage.setItem('h2', JSON.stringify(d.habits));
+                    }
+                    if (d.hlog !== undefined) {
+                        state.hlog = d.hlog;
+                        localStorage.setItem('hl2', JSON.stringify(d.hlog));
+                    }
+                    if (d.todos !== undefined) {
+                        state.todos = d.todos;
+                        localStorage.setItem('t2', JSON.stringify(d.todos));
+                    }
+                    if (d.calEvents !== undefined) {
+                        state.calEvents = d.calEvents;
+                        localStorage.setItem('ev2', JSON.stringify(d.calEvents));
+                    }
+                    if (d.expenses !== undefined) {
+                        state.expenses = d.expenses;
+                        localStorage.setItem('ex2', JSON.stringify(d.expenses));
+                    }
+                    if (d.notes !== undefined) {
+                        state.notes = d.notes;
+                        localStorage.setItem('nt2', JSON.stringify(d.notes));
+                    }
+                    if (d.grocery !== undefined) {
+                        state.grocery = d.grocery;
+                        localStorage.setItem('gr2', JSON.stringify(d.grocery));
+                    }
+
+                    // Re-render with updated data
+                    if (window._render) {
+                        window._render();
+                        console.log('✓ UI updated with latest data');
+                    }
+
+                    _isLoadingFromFirebase = false;
+                } else {
+                    console.log('No cloud data found, creating new document');
+                    dbSave();
+                }
+            },
+            (error) => {
+                console.error('❌ Firestore listener error:', error);
+                _isLoadingFromFirebase = false;
+            }
+        );
     } catch (e) {
-        console.error('❌ Firestore load error:', e);
-    } finally {
-        _isLoadingFromFirebase = false;
+        console.error('❌ Error setting up listener:', e);
     }
 };
