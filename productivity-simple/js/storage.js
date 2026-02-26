@@ -40,7 +40,12 @@ const isMobile = () => {
 };
 
 export const initFirebase = () => {
-    if (typeof firebase === 'undefined') return;
+    if (typeof firebase === 'undefined') {
+        console.warn('Firebase library not loaded yet');
+        // Try again in a moment
+        setTimeout(initFirebase, 500);
+        return;
+    }
 
     try {
         const fbApp = firebase.initializeApp({
@@ -55,17 +60,22 @@ export const initFirebase = () => {
         _db = firebase.firestore();
         _auth = firebase.auth();
 
+        console.log('Firebase initialized successfully');
+
         _auth.onAuthStateChanged(async function (user) {
+            console.log('Auth state changed:', user?.email || 'anonymous');
             if (user) {
                 _currentUser = user;
                 updateAuthUI(user);
                 await dbLoad();
             } else {
-                _auth.signInAnonymously();
+                _auth.signInAnonymously().catch(e => {
+                    console.warn('Anonymous sign-in failed:', e);
+                });
             }
         });
     } catch (e) {
-        console.warn('Firebase init failed, running offline', e);
+        console.error('Firebase init error:', e);
     }
 };
 
@@ -117,62 +127,47 @@ export const authAction = () => {
     const { toast } = require('./utils');
 
     if (!_auth) {
-        toast('Auth not ready');
+        toast('Auth not ready. Please refresh the page');
         return;
     }
 
     if (!_currentUser || _currentUser.isAnonymous) {
         setAuthLoading(true, 'Opening Google sign-in…');
         const provider = new firebase.auth.GoogleAuthProvider();
+        provider.addScope('profile');
+        provider.addScope('email');
 
-        // Try to sign in with popup first (works on most cases)
+        // Simply try to sign in with popup
         _auth.signInWithPopup(provider)
-            .then(() => {
+            .then(async (result) => {
+                _currentUser = result.user;
+                updateAuthUI(result.user);
+                // Load user data from cloud
+                await dbLoad();
                 setAuthLoading(false);
-                toast('Signed in! Data is now synced 🎉');
+                toast('Signed in! Data synced 🎉');
             })
-            .catch(e => {
-                console.warn('Popup auth failed, trying redirect...', e.code);
+            .catch((e) => {
+                console.error('Sign-in error:', e);
+                setAuthLoading(false);
 
-                // If popup fails (blocked by private mode, mobile, etc), try redirect
-                if (e.code === 'auth/popup-closed-by-user') {
-                    setAuthLoading(false);
-                    return;
-                }
-
-                if (e.code === 'auth/popup-blocked' ||
-                    e.code === 'auth/network-request-failed' ||
-                    e.message?.includes('popup') ||
-                    e.message?.includes('blocked')) {
-                    // Popup was blocked (likely private mode) - try redirect
-                    _auth.signInWithRedirect(provider)
-                        .catch(redirectError => {
-                            setAuthLoading(false);
-                            console.error('All auth methods failed:', redirectError);
-                            toast('⚠️ Sign-in blocked (try normal mode)\nIf in private mode, disable it and try again');
-                        });
-                } else if (e.code === 'auth/credential-already-in-use') {
-                    // User already exists with different provider
-                    _auth.signInWithPopup(provider)
-                        .then(() => {
-                            setAuthLoading(false);
-                            toast('Signed in ✅');
-                        })
-                        .catch(err => {
-                            setAuthLoading(false);
-                            toast('Sign-in failed ❌');
-                        });
-                } else {
-                    setAuthLoading(false);
-                    toast('🔐 Sign-in failed. Try disabling private mode');
+                // Only show error if user didn't cancel
+                if (e.code !== 'auth/popup-closed-by-user') {
+                    toast('❌ Sign-in failed. Try again or check console');
                 }
             });
     } else {
         if (!confirm('Sign out? Your data stays in the cloud.')) return;
         setAuthLoading(true, 'Signing out…');
         _auth.signOut().then(() => {
+            _currentUser = null;
             setAuthLoading(false);
+            updateAuthUI(null);
             toast('Signed out');
+        }).catch(e => {
+            setAuthLoading(false);
+            console.error('Sign out error:', e);
+            toast('Error signing out');
         });
     }
 };
