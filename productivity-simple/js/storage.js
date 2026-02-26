@@ -34,6 +34,11 @@ export const S = {
 // Firebase Setup
 // ──────────────────────────────────────────────────────────
 
+// Helper function to detect mobile
+const isMobile = () => {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+};
+
 export const initFirebase = () => {
     if (typeof firebase === 'undefined') return;
 
@@ -97,6 +102,15 @@ export const updateAuthUI = user => {
 export const setAuthLoading = (show, msg) => {
     document.getElementById('auth-loading').classList.toggle('show', show);
     if (msg) document.getElementById('auth-loading-msg').textContent = msg;
+
+    // Auto-hide loading screen after 30 seconds to prevent stuck UI on mobile
+    if (show) {
+        setTimeout(() => {
+            if (document.getElementById('auth-loading').classList.contains('show')) {
+                document.getElementById('auth-loading').classList.remove('show');
+            }
+        }, 30000);
+    }
 };
 
 export const authAction = () => {
@@ -110,27 +124,45 @@ export const authAction = () => {
     if (!_currentUser || _currentUser.isAnonymous) {
         setAuthLoading(true, 'Opening Google sign-in…');
         const provider = new firebase.auth.GoogleAuthProvider();
-        _auth.currentUser.linkWithPopup(provider)
-            .then(() => {
-                setAuthLoading(false);
-                toast('Signed in! Data is now synced 🎉');
-            })
-            .catch(e => {
-                if (e.code === 'auth/credential-already-in-use') {
-                    _auth.signInWithPopup(provider)
-                        .then(() => {
-                            setAuthLoading(false);
-                            toast('Signed in ✅');
-                        })
-                        .catch(() => {
-                            setAuthLoading(false);
-                            toast('Sign-in failed ❌');
-                        });
-                } else {
+
+        // Use redirect on mobile, popup on desktop
+        if (isMobile()) {
+            // Mobile: use redirect flow
+            _auth.currentUser.linkWithRedirect(provider)
+                .catch(e => {
+                    // If link fails, try regular signin
+                    if (e.code === 'auth/credential-already-in-use') {
+                        _auth.signInWithRedirect(provider);
+                    } else {
+                        setAuthLoading(false);
+                        console.error('Mobile auth error:', e);
+                        toast('Sign-in failed ❌');
+                    }
+                });
+        } else {
+            // Desktop: use popup flow (original behavior)
+            _auth.currentUser.linkWithPopup(provider)
+                .then(() => {
                     setAuthLoading(false);
-                    if (e.code !== 'auth/popup-closed-by-user') toast('Sign-in failed ❌');
-                }
-            });
+                    toast('Signed in! Data is now synced 🎉');
+                })
+                .catch(e => {
+                    if (e.code === 'auth/credential-already-in-use') {
+                        _auth.signInWithPopup(provider)
+                            .then(() => {
+                                setAuthLoading(false);
+                                toast('Signed in ✅');
+                            })
+                            .catch(() => {
+                                setAuthLoading(false);
+                                toast('Sign-in failed ❌');
+                            });
+                    } else {
+                        setAuthLoading(false);
+                        if (e.code !== 'auth/popup-closed-by-user') toast('Sign-in failed ❌');
+                    }
+                });
+        }
     } else {
         if (!confirm('Sign out? Your data stays in the cloud.')) return;
         setAuthLoading(true, 'Signing out…');
