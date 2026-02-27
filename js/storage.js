@@ -93,6 +93,32 @@ export const initFirebase = () => {
 };
 
 const setupAuthListener = () => {
+    // Complete redirect sign-in on return (mobile)
+    _auth.getRedirectResult().then(async (result) => {
+        if (result.user) {
+            _currentUser = result.user;
+            const existing = await _db.collection('users').doc(result.user.uid).get();
+            if (!existing.exists && window._appState) {
+                console.log('🆕 New account (redirect), migrating local data to Firestore...');
+                await _db.collection('users').doc(result.user.uid).set({
+                    habits: window._appState.habits,
+                    hlog: window._appState.hlog,
+                    todos: window._appState.todos,
+                    calEvents: window._appState.calEvents,
+                    expenses: window._appState.expenses,
+                    notes: window._appState.notes,
+                    grocery: window._appState.grocery,
+                    games: window._appState.games
+                });
+            }
+            (window._utils?.toast || (() => {}))('✓ Signed in! Data synced');
+        }
+        setAuthLoading(false);
+    }).catch(e => {
+        setAuthLoading(false);
+        if (e.code !== 'auth/popup-closed-by-user') console.error('Redirect sign-in error:', e);
+    });
+
     _auth.onAuthStateChanged(async (user) => {
         console.log('🔐 Auth state changed:', user?.email || user?.uid || 'none');
         if (user && !user.isAnonymous) {
@@ -152,15 +178,16 @@ export const updateAuthUI = user => {
 };
 
 export const setAuthLoading = (show, msg) => {
-    document.getElementById('auth-loading').classList.toggle('show', show);
-    if (msg) document.getElementById('auth-loading-msg').textContent = msg;
+    const el = document.getElementById('auth-loading');
+    const msgEl = document.getElementById('auth-loading-msg');
+    if (el) el.classList.toggle('show', show);
+    if (msgEl && msg) msgEl.textContent = msg;
 
     // Auto-hide loading screen after 30 seconds to prevent stuck UI on mobile
     if (show) {
         setTimeout(() => {
-            if (document.getElementById('auth-loading').classList.contains('show')) {
-                document.getElementById('auth-loading').classList.remove('show');
-            }
+            const loadingEl = document.getElementById('auth-loading');
+            if (loadingEl?.classList.contains('show')) loadingEl.classList.remove('show');
         }, 30000);
     }
 };
@@ -202,7 +229,12 @@ export const authAction = async () => {
             provider.addScope('profile');
             provider.addScope('email');
 
-            const result = await _auth.signInWithPopup(provider);
+            let result;
+            if (isMobile()) {
+                await _auth.signInWithRedirect(provider);
+                return; // Page will redirect; getRedirectResult() handles return in setupAuthListener
+            }
+            result = await _auth.signInWithPopup(provider);
             console.log('✅ Signed in as:', result.user.email);
             _currentUser = result.user;
 
@@ -369,10 +401,11 @@ export const dbLoad = async () => {
                         state.grocery = d.grocery;
                         localStorage.setItem('gr2', JSON.stringify(d.grocery));
                     }
-                    if (d.games !== undefined) {
+                    if (d.games !== undefined && Array.isArray(d.games)) {
                         state.games = d.games;
                         localStorage.setItem('gm2', JSON.stringify(d.games));
-                    } else if (state.games?.length) {
+                    } else if (d.games === null && state.games?.length) {
+                        // Firestore returned null — keep local data, migrate up
                         // games field missing from Firestore — migrate local data up
                         console.log('🆕 Migrating local games to Firestore...');
                         _db.collection('users').doc(_currentUser.uid).set(

@@ -7,7 +7,7 @@
  */
 
 import {
-    esc, fmt$, uid, today, ddiff, fdate, fdate2, shortDate,
+    esc, escJs, fmt$, uid, today, ddiff, fdate, fdate2, shortDate,
     toast, openModal, closeModal, showPage, byId, queryAll
 } from './utils.js';
 
@@ -58,7 +58,8 @@ const darkMode = {
     apply() {
         const isDark = window._appState.dark;
         document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
-        byId('dark-ic').textContent = isDark ? '☀️' : '🌙';
+        const ic = byId('dark-ic');
+        if (ic) ic.textContent = isDark ? '☀️' : '🌙';
     }
 };
 
@@ -345,6 +346,7 @@ const checkHabitReminders = () => {
 const renderHabits = () => {
     const state = window._appState;
     const g = byId('hgrid');
+    if (!g) return;
     if (!state.habits.length) {
         g.innerHTML = `<div class="empty"><span class="empty-ic">🔥</span>No habits yet.<br>Hit <strong>+</strong> to add one.</div>`;
         return;
@@ -363,7 +365,7 @@ const renderHabits = () => {
         <div class="hdot" style="background:${h.color}"></div>
         <span class="hname">${esc(h.name)}</span>
         ${h.reminderEnabled && h.reminderTime ? `<span style="font-size:10px;color:var(--t3);margin-right:4px">🔔${h.reminderTime}</span>` : ''}
-        <button class="hchk ${done ? 'done' : ''}" style="${done ? `background:${h.color};border-color:${h.color}` : ''}" onclick="window._habits?.toggle?.('${h.id}')">${done ? '✓' : ''}</button>
+        <button class="hchk ${done ? 'done' : ''}" style="${done ? `background:${h.color};border-color:${h.color}` : ''}" onclick="window._habits?.toggle?.('${escJs(h.id)}')">${done ? '✓' : ''}</button>
       </div>
       <div class="hmeta">🔥 ${streak} day streak &nbsp;·&nbsp; ${l30.filter(Boolean).length}/30 this month</div>
       <div class="hhm">${l30.map(v => `<div class="hc" style="background:${v ? h.color : 'var(--border)'};opacity:${v ? 1 : .35}"></div>`).join('')}</div>
@@ -371,8 +373,8 @@ const renderHabits = () => {
       <div class="hweek-lbl">This week: ${weekDone} / ${h.weeklyGoal}</div>
       <div class="hweek-bar"><div class="hweek-fill" style="width:${weekPct}%;background:${h.color}"></div></div>` : ''}
       <div style="display:flex;justify-content:flex-end;gap:4px;margin-top:6px">
-        <button class="ico-btn" onclick="window._habits?.edit?.('${h.id}')" title="Edit">✎</button>
-        <button class="ico-btn" onclick="window._habits?.delete?.('${h.id}')">🗑</button>
+        <button class="ico-btn" onclick="window._habits?.edit?.('${escJs(h.id)}')" title="Edit">✎</button>
+        <button class="ico-btn" onclick="window._habits?.delete?.('${escJs(h.id)}')">🗑</button>
       </div>`;
         g.appendChild(card);
     });
@@ -380,11 +382,11 @@ const renderHabits = () => {
 
 window._habits = { create: createHabit, toggle: toggleHabit, delete: deleteHabit, edit: openEditHabit, saveEdit: saveEditHabit };
 
-byId('hname').addEventListener('keydown', e => {
+byId('hname')?.addEventListener('keydown', e => {
     if (e.key === 'Enter') createHabit();
 });
 
-byId('hname-edit').addEventListener('keydown', e => {
+byId('hname-edit')?.addEventListener('keydown', e => {
     if (e.key === 'Enter') saveEditHabit();
 });
 
@@ -491,6 +493,7 @@ const todoApplySort = () => renderTodos();
 const renderTodos = () => {
     const state = window._appState;
     const el = byId('tlist');
+    if (!el) return;
     const q = (byId('todo-search')?.value || '').toLowerCase();
     const filter = byId('todo-filter')?.value || 'all';
     const sortBy = byId('todo-sort')?.value || 'priority';
@@ -532,7 +535,7 @@ const renderTodos = () => {
     ];
     el.innerHTML = sorted.map(t => `
     <div class="ti">
-      <input type="checkbox" ${t.done ? 'checked' : ''} onchange="window._todos?.toggle?.('${t.id}')"/>
+      <input type="checkbox" ${t.done ? 'checked' : ''} onchange="window._todos?.toggle?.('${escJs(t.id)}')"/>
       <span class="tt ${t.done ? 'done' : ''}">${esc(t.title)}</span>
       <div class="tmeta">
         ${t.priority !== 'none' ? `<span class="chip c${t.priority[0]}">${t.priority}</span>` : ''}
@@ -540,18 +543,18 @@ const renderTodos = () => {
         ${t.repeat && t.repeat !== 'none' ? `<span class="chip" style="background:var(--pdim);color:var(--primary)">🔁 ${t.repeat}</span>` : ''}
         ${t.pomCount ? `<span class="chip" style="background:var(--pdim);color:var(--primary)">🍅×${t.pomCount}</span>` : ''}
       </div>
-      <button class="ico-btn" onclick="window._todos?.edit?.('${t.id}')" title="Edit">✎</button>
-      <button class="ico-btn" onclick="window._todos?.delete?.('${t.id}')">×</button>
+      <button class="ico-btn" onclick="window._todos?.edit?.('${escJs(t.id)}')" title="Edit">✎</button>
+      <button class="ico-btn" onclick="window._todos?.delete?.('${escJs(t.id)}')">×</button>
     </div>`).join('');
 };
 
 window._todos = { create: createTodo, toggle: toggleTodo, delete: deleteTodo, edit: openEditTodo, saveEdit: saveEditTodo, search: todoSearch, applyFilter: todoApplyFilter, applySort: todoApplySort };
 
-byId('ttitle').addEventListener('keydown', e => {
+byId('ttitle')?.addEventListener('keydown', e => {
     if (e.key === 'Enter') createTodo();
 });
 
-byId('ttitle-edit').addEventListener('keydown', e => {
+byId('ttitle-edit')?.addEventListener('keydown', e => {
     if (e.key === 'Enter') saveEditTodo();
 });
 
@@ -562,6 +565,7 @@ byId('ttitle-edit').addEventListener('keydown', e => {
 const createEvent = () => {
     const titleEl = byId('etitle');
     const dateEl = byId('edate');
+    if (!titleEl || !dateEl) return;
     const title = titleEl.value.trim();
     const date = dateEl.value || today();
     titleEl.style.borderColor = '';
@@ -654,6 +658,7 @@ const calClick = ds => {
 const showDetail = ds => {
     const state = window._appState;
     const det = byId('cdetail');
+    if (!det) return;
     const de = state.calEvents.filter(e => e.date === ds);
     const dt = state.todos.filter(t => t.due === ds);
     if (!de.length && !dt.length) {
@@ -666,8 +671,8 @@ const showDetail = ds => {
         html += `<div class="det-row">
       <div class="det-dot" style="background:var(--primary)"></div>
       <span style="flex:1">${e.time ? `<strong>${esc(e.time)}</strong> ` : ''}${esc(e.title)}${e.evnotes ? `<br><small style="color:var(--t3)">${esc(e.evnotes)}</small>` : ''}</span>
-      <button class="ico-btn" onclick="window._calendar?.editEvent?.('${e.id}')" title="Edit">✎</button>
-      <button class="ico-btn" onclick="window._calendar?.deleteEvent?.('${e.id}')">×</button>
+      <button class="ico-btn" onclick="window._calendar?.editEvent?.('${escJs(e.id)}')" title="Edit">✎</button>
+      <button class="ico-btn" onclick="window._calendar?.deleteEvent?.('${escJs(e.id)}')">×</button>
     </div>`;
     });
     dt.forEach(t => {
@@ -703,7 +708,7 @@ const renderCalendar = () => {
         const isT = ds === todStr;
         const isSel = ds === state.calSel;
         const items = (lookup[ds] || []).slice(0, 3);
-        h += `<div class="cc${isT ? ' today' : ''}${isSel ? ' sel' : ''}" onclick="window._calendar?.click?.('${ds}')">
+        h += `<div class="cc${isT ? ' today' : ''}${isSel ? ' sel' : ''}" onclick="window._calendar?.click?.('${escJs(ds)}')">
       <div class="cnum">${d}</div>
       ${items.map(it => `<div class="ce ${it.cls}">${esc(it.label)}</div>`).join('')}
     </div>`;
@@ -724,11 +729,11 @@ window._calendar = {
     saveEdit: saveEditEvent
 };
 
-byId('etitle').addEventListener('keydown', e => {
+byId('etitle')?.addEventListener('keydown', e => {
     if (e.key === 'Enter') createEvent();
 });
 
-byId('eetitle').addEventListener('keydown', e => {
+byId('eetitle')?.addEventListener('keydown', e => {
     if (e.key === 'Enter') saveEditEvent();
 });
 
@@ -936,13 +941,14 @@ const pomRender = () => {
     document.title = pRun ? `${m}:${s} · ${PMODES[pMode].lbl}` : 'Focus';
 };
 
+const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
+
 const pomApplySettings = () => {
-    pCfg = {
-        work: +byId('sw').value || 25,
-        short: +byId('ss').value || 5,
-        long: +byId('sl').value || 15,
-        n: +byId('sn').value || 4
-    };
+    const work = clamp(+(byId('sw')?.value ?? 25), 1, 90);
+    const short = clamp(+(byId('ss')?.value ?? 5), 1, 30);
+    const long = clamp(+(byId('sl')?.value ?? 15), 1, 60);
+    const n = clamp(+(byId('sn')?.value ?? 4), 1, 12);
+    pCfg = { work, short, long, n };
     S.set('pcfg', pCfg);
     if (!pRun) pomSetMode(pMode);
 };
@@ -1108,7 +1114,7 @@ const renderExpenses = () => {
         }
     }
     const cats = ['All', ...new Set(state.expenses.map(x => x.cat))];
-    byId('exp-filters').innerHTML = cats.map(c => `<button class="fchip${c === state.expFilter ? ' active' : ''}" onclick="window._expenses?.setFilter?.('${esc(c)}')">${esc(c)}</button>`).join('');
+    byId('exp-filters').innerHTML = cats.map(c => `<button class="fchip${c === state.expFilter ? ' active' : ''}" onclick="window._expenses?.setFilter?.('${escJs(c)}')">${esc(c)}</button>`).join('');
     const filtered = state.expFilter === 'All' ? state.expenses : state.expenses.filter(x => x.cat === state.expFilter);
     drawPie();
     drawBar();
@@ -1125,13 +1131,13 @@ const renderExpenses = () => {
         <div class="exp-sub">${esc(x.cat.split(' ').slice(1).join(' '))} · ${fdate2(x.date)}</div>
       </div>
       <div class="exp-amt neg">${fmt$(x.amount)}</div>
-      <button class="ico-btn" onclick="window._expenses?.delete?.('${x.id}')">×</button>
+      <button class="ico-btn" onclick="window._expenses?.delete?.('${escJs(x.id)}')">×</button>
     </div>`).join('');
 };
 
 window._expenses = { create: createExpense, delete: deleteExpense, setFilter: expSetFilter, setBudget: expSetBudget };
 
-byId('xdesc').addEventListener('keydown', e => {
+byId('xdesc')?.addEventListener('keydown', e => {
     if (e.key === 'Enter') createExpense();
 });
 
@@ -1263,7 +1269,7 @@ const renderNotes = (resetEditor = true) => {
     }
 
     list.innerHTML = sorted.map(n => `
-    <div class="note-item${n.id === state.activeNote ? ' active' : ''}" onclick="window._notes?.select?.('${n.id}')">
+    <div class="note-item${n.id === state.activeNote ? ' active' : ''}" onclick="window._notes?.select?.('${escJs(n.id)}')">
       <div class="note-title-row">
         <span class="note-item-title">${n.pinned ? '📌 ' : ''}${esc(n.title) || 'Untitled'}</span>
         <span class="note-item-date">${shortDate(n.updatedAt)}</span>
@@ -1447,7 +1453,7 @@ const quickStatusChange = (id, status) => {
 
 const renderGames = () => {
     const state = window._appState;
-    const games = state.games;
+    const games = Array.isArray(state.games) ? state.games : [];
 
     // Stats bar
     const statsEl = byId('games-stats');
@@ -1492,13 +1498,13 @@ const renderGames = () => {
                 ${g.rating ? `<div class="game-stars">${stars} <span style="font-size:11px;color:var(--t3);margin-left:4px">${g.rating}/10</span></div>` : ''}
                 ${g.notes ? `<div class="game-notes">${esc(g.notes)}</div>` : ''}
                 <div class="game-actions">
-                    <select class="game-status-select" onchange="window._games?.quickStatus?.('${g.id}', this.value)">
+                    <select class="game-status-select" onchange="window._games?.quickStatus?.('${escJs(g.id)}', this.value)">
                         ${Object.entries(GAME_STATUSES).map(([k, v]) =>
                             `<option value="${k}"${g.status === k ? ' selected' : ''}>${v.label}</option>`
                         ).join('')}
                     </select>
-                    <button class="ico-btn" onclick="window._games?.edit?.('${g.id}')" title="Edit">✎</button>
-                    <button class="ico-btn" onclick="window._games?.delete?.('${g.id}')">🗑</button>
+                    <button class="ico-btn" onclick="window._games?.edit?.('${escJs(g.id)}')" title="Edit">✎</button>
+                    <button class="ico-btn" onclick="window._games?.delete?.('${escJs(g.id)}')">🗑</button>
                 </div>
             </div>
         </div>`;
@@ -1609,14 +1615,14 @@ const renderGrocery = () => {
       </div>
       <div class="card" style="overflow:hidden">
         ${items.map(g => `
-          <div class="gr-item ${g.checked ? 'checked' : ''}" onclick="window._grocery?.toggle?.('${g.id}')">
+          <div class="gr-item ${g.checked ? 'checked' : ''}" onclick="window._grocery?.toggle?.('${escJs(g.id)}')">
             <div class="gr-cb">${g.checked ? '✓' : ''}</div>
             <div class="gr-info">
               <div class="gr-name">${esc(g.name)}</div>
               ${g.note ? `<div class="gr-sub">${esc(g.note)}</div>` : ''}
             </div>
             <div class="gr-qty">${g.qty}${g.unit ? ' ' + esc(g.unit) : ''}</div>
-            <button class="ico-btn" onclick="event.stopPropagation();window._grocery?.delete?.('${g.id}')">×</button>
+            <button class="ico-btn" onclick="event.stopPropagation();window._grocery?.delete?.('${escJs(g.id)}')">×</button>
           </div>`).join('')}
       </div>
     </div>`;
@@ -1661,7 +1667,7 @@ const checkGroceryShare = () => {
 
 window._grocery = { create: createGrocery, toggle: toggleGrocery, delete: deleteGrocery, clearDone: groceryClearDone, resetAll: groceryResetAll, share: groceryShare };
 
-byId('gname').addEventListener('keydown', e => {
+byId('gname')?.addEventListener('keydown', e => {
     if (e.key === 'Enter') createGrocery();
 });
 
@@ -1736,16 +1742,20 @@ byId('import-file')?.addEventListener('change', function (e) {
     reader.onload = function (event) {
         try {
             const data = JSON.parse(event.target.result);
+            if (!data || typeof data !== 'object') throw new Error('Invalid format');
             const state = window._appState;
 
-            // Import data
-            if (data.habits) state.habits = data.habits;
-            if (data.hlog) state.hlog = data.hlog;
-            if (data.todos) state.todos = data.todos;
-            if (data.calEvents) state.calEvents = data.calEvents;
-            if (data.expenses) state.expenses = data.expenses;
-            if (data.notes) state.notes = data.notes;
-            if (data.grocery) state.grocery = data.grocery;
+            const asArray = v => Array.isArray(v) ? v : [];
+            const asObject = v => (v && typeof v === 'object' && !Array.isArray(v)) ? v : {};
+
+            // Import with validation
+            if (data.habits) state.habits = asArray(data.habits);
+            if (data.hlog) state.hlog = asObject(data.hlog);
+            if (data.todos) state.todos = asArray(data.todos);
+            if (data.calEvents) state.calEvents = asArray(data.calEvents);
+            if (data.expenses) state.expenses = asArray(data.expenses);
+            if (data.notes) state.notes = asArray(data.notes);
+            if (data.grocery) state.grocery = asArray(data.grocery);
 
             // Save to localStorage
             S.set('h2', state.habits);
@@ -1805,7 +1815,7 @@ byId('contact-form')?.addEventListener('submit', (e) => contactForm.submit(e));
 renderSwatches();
 pomSetMode('work');
 noiseApplyState();
-byId('note-editor').style.display = 'none';
+byId('note-editor') && (byId('note-editor').style.display = 'none');
 darkMode.apply();
 settings.updateUI();
 initFirebase();
@@ -1820,7 +1830,7 @@ pomUpdateTodoDropdown();
 setInterval(checkHabitReminders, 60000);
 
 // Pie chart click-to-filter
-byId('pie-canvas').addEventListener('click', e => {
+byId('pie-canvas')?.addEventListener('click', e => {
     const rect = e.target.getBoundingClientRect();
     const scaleX = e.target.width / rect.width;
     const scaleY = e.target.height / rect.height;

@@ -11,7 +11,14 @@ export const esc = s => String(s)
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+
+/** Escape string for safe use inside JS/HTML attribute context (e.g. onclick="fn('${escJs(id)}')") */
+export const escJs = s => String(s)
+    .replace(/\\/g, '\\\\')
+    .replace(/'/g, "\\'")
+    .replace(/"/g, '\\"');
 
 export const fmt$ = n => '$' + Math.abs(n).toFixed(2);
 
@@ -23,29 +30,31 @@ export const uid = () => Math.random().toString(36).slice(2, 9);
 
 export const today = () => new Date().toISOString().slice(0, 10);
 
-export const ddiff = ds =>
-    Math.round((new Date(ds + 'T00:00:00') - new Date(today() + 'T00:00:00')) / 86400000);
+export const ddiff = ds => {
+    if (!ds || typeof ds !== 'string') return NaN;
+    const d = new Date(ds + 'T00:00:00');
+    const todayDate = new Date(today() + 'T00:00:00');
+    if (isNaN(d.getTime()) || isNaN(todayDate.getTime())) return NaN;
+    return Math.round((d - todayDate) / 86400000);
+};
 
 export const fdate = ds => {
     const d = ddiff(ds);
+    if (Number.isNaN(d)) return ds || '';
     if (d === 0) return 'Today';
     if (d === 1) return 'Tomorrow';
     if (d === -1) return 'Yesterday';
-    return new Date(ds + 'T00:00:00').toLocaleDateString(undefined, {
-        month: 'short',
-        day: 'numeric'
-    });
+    const parsed = new Date(ds + 'T00:00:00');
+    return isNaN(parsed.getTime()) ? ds : parsed.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
 };
 
 export const fdate2 = ds => {
     const d = ddiff(ds);
+    if (Number.isNaN(d)) return ds || '';
     if (d === 0) return 'Today';
     if (d === -1) return 'Yesterday';
-    return new Date(ds + 'T00:00:00').toLocaleDateString(undefined, {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric'
-    });
+    const parsed = new Date(ds + 'T00:00:00');
+    return isNaN(parsed.getTime()) ? ds : parsed.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
 };
 
 export const shortDate = ts => {
@@ -104,6 +113,9 @@ export const showPage = (p, render) => {
 export const query = selector => document.querySelector(selector);
 export const queryAll = selector => document.querySelectorAll(selector);
 export const byId = id => document.getElementById(id);
+
+/** Safe byId - returns null if element missing, use with optional chaining: safeId('x')?.focus() */
+export const safeId = id => document.getElementById(id) ?? null;
 
 export const setAttr = (el, attr, value) => el.setAttribute(attr, value);
 export const getAttr = (el, attr) => el.getAttribute(attr);
