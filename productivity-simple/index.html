@@ -53,6 +53,9 @@
         <button class="nb" data-page="settings">
           <span class="ic">⚙️</span><span>Settings</span>
         </button>
+        <button class="nb" data-page="games">
+          <span class="ic">🎮</span><span>Games</span>
+        </button>
         <button class="nb" data-page="qa">
           <span class="ic">❓</span><span>QA</span>
         </button>
@@ -594,6 +597,27 @@
               </p>
             </details>
           </div>
+        <!-- GAMES PAGE -->
+        <div id="page-games" class="page">
+          <div class="ph"><h2>Game Backlog</h2></div>
+
+          <!-- Stats bar -->
+          <div class="games-stats" id="games-stats"></div>
+
+          <!-- Status tabs -->
+          <div class="games-tabs" id="games-tabs">
+            <button class="games-tab active" data-status="all">All</button>
+            <button class="games-tab" data-status="wishlist">🕹 Want to Play</button>
+            <button class="games-tab" data-status="playing">▶ Playing</button>
+            <button class="games-tab" data-status="completed">✅ Completed</button>
+            <button class="games-tab" data-status="dropped">💀 Dropped</button>
+          </div>
+
+          <!-- Search within backlog -->
+          <input class="search-input" id="games-search" placeholder="Search your backlog…" oninput="window._games?.search?.()" style="margin-bottom:14px" />
+
+          <!-- Game list -->
+          <div id="games-list"></div>
         </div>
       </main>
     </div>
@@ -905,6 +929,106 @@
         <div class="ma">
           <button class="btn btn-g" onclick="window._utils?.closeModal?.()">Cancel</button>
           <button class="btn btn-d" onclick="window._auth?.confirmLogout?.()">Sign out</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADD GAME MODAL -->
+    <div id="mg-add" class="mbk">
+      <div class="modal">
+        <h3>Add Game</h3>
+
+        <!-- RAWG search -->
+        <div class="f">
+          <label>Search game</label>
+          <div class="game-search-wrap">
+            <input type="text" id="game-search-input" placeholder="e.g. Elden Ring…" autocomplete="off"
+              oninput="window._games?.liveSearch?.()" />
+            <div id="game-search-results" class="game-search-results"></div>
+          </div>
+        </div>
+
+        <!-- Selected game preview -->
+        <div id="game-selected-preview" class="game-selected-preview" style="display:none"></div>
+
+        <!-- Hidden fields populated by API selection or manual entry -->
+        <input type="hidden" id="gnew-rawg-id" />
+        <input type="hidden" id="gnew-cover" />
+
+        <!-- Manual title fallback (shown only if not from API) -->
+        <div class="f" id="gnew-title-row">
+          <label>Title <span style="color:var(--t3);font-weight:400;font-size:12px">(or type manually)</span></label>
+          <input type="text" id="gnew-title" placeholder="Game title" />
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="f">
+            <label>Status</label>
+            <select id="gnew-status">
+              <option value="wishlist">🕹 Want to Play</option>
+              <option value="playing">▶ Playing</option>
+              <option value="completed">✅ Completed</option>
+              <option value="dropped">💀 Dropped</option>
+            </select>
+          </div>
+          <div class="f">
+            <label>Rating <span style="color:var(--t3);font-weight:400">/ 10</span></label>
+            <input type="number" id="gnew-rating" min="1" max="10" placeholder="—" />
+          </div>
+        </div>
+
+        <div class="f">
+          <label>Platform</label>
+          <input type="text" id="gnew-platform" placeholder="e.g. PC, PS5, Switch…" />
+        </div>
+        <div class="f">
+          <label>Notes (optional)</label>
+          <textarea id="gnew-notes" placeholder="Impressions, tips, story notes…" rows="2"></textarea>
+        </div>
+
+        <div class="ma">
+          <button class="btn btn-g" onclick="window._utils?.closeModal?.()">Cancel</button>
+          <button class="btn btn-p" onclick="window._games?.create?.()">Add to backlog</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- EDIT GAME MODAL -->
+    <div id="mg-edit" class="mbk">
+      <div class="modal">
+        <h3>Edit Game</h3>
+        <input type="hidden" id="gedit-id" />
+
+        <div id="gedit-preview" class="game-selected-preview" style="margin-bottom:14px"></div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="f">
+            <label>Status</label>
+            <select id="gedit-status">
+              <option value="wishlist">🕹 Want to Play</option>
+              <option value="playing">▶ Playing</option>
+              <option value="completed">✅ Completed</option>
+              <option value="dropped">💀 Dropped</option>
+            </select>
+          </div>
+          <div class="f">
+            <label>Rating / 10</label>
+            <input type="number" id="gedit-rating" min="1" max="10" placeholder="—" />
+          </div>
+        </div>
+
+        <div class="f">
+          <label>Platform</label>
+          <input type="text" id="gedit-platform" placeholder="e.g. PC, PS5, Switch…" />
+        </div>
+        <div class="f">
+          <label>Notes (optional)</label>
+          <textarea id="gedit-notes" rows="3"></textarea>
+        </div>
+
+        <div class="ma">
+          <button class="btn btn-g" onclick="window._utils?.closeModal?.()">Cancel</button>
+          <button class="btn btn-p" onclick="window._games?.saveEdit?.()">Save</button>
         </div>
       </div>
     </div>

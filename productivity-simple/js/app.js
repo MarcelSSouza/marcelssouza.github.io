@@ -25,6 +25,7 @@ window._appState = {
     expenses: S.get('ex2', []),
     notes: S.get('nt2', []),
     grocery: S.get('gr2', []),
+    games: S.get('gm2', []),
     dark: S.get('dark', false),
     page: 'habits',
     calY: new Date().getFullYear(),
@@ -125,6 +126,7 @@ const render = () => {
     if (state.page === 'expenses') renderExpenses();
     if (state.page === 'notes') renderNotes();
     if (state.page === 'grocery') renderGrocery();
+    if (state.page === 'games') renderGames();
 };
 
 window._render = render;
@@ -146,7 +148,7 @@ queryAll('.nb').forEach(btn => {
 
 const fabClick = () => {
     const state = window._appState;
-    const map = { habits: 'mh', todos: 'mt', calendar: 'me', expenses: 'mx', grocery: 'mg', notes: null };
+    const map = { habits: 'mh', todos: 'mt', calendar: 'me', expenses: 'mx', grocery: 'mg', notes: null, games: 'mg-add' };
 
     if (state.page === 'notes') {
         newNote();
@@ -179,6 +181,9 @@ const fabClick = () => {
         byId('xdate').value = today();
         byId('xdesc').value = '';
         byId('xamount').value = '';
+    }
+    if (state.page === 'games') {
+        gameResetAddModal();
     }
 
     openModal(id);
@@ -1248,6 +1253,261 @@ const renderNotes = (resetEditor = true) => {
 };
 
 window._notes = { save: noteSave, delete: noteDelete, select: selectNote, search: noteSearch, pin: togglePinNote };
+
+// ══════════════════════════════════════════════════════════
+// GAMES BACKLOG
+// ══════════════════════════════════════════════════════════
+
+const RAWG_KEY = 'a0d9375a85254c8fbe26e0f9a052dd55'; // free public key
+const GAME_STATUSES = {
+    wishlist:  { label: '🕹 Want to Play', color: '#06b6d4' },
+    playing:   { label: '▶ Playing',       color: '#5b6ef5' },
+    completed: { label: '✅ Completed',    color: '#22c55e' },
+    dropped:   { label: '💀 Dropped',      color: '#9ca3af' }
+};
+
+let _gameSearchTimer = null;
+let _gameActiveTab = 'all';
+let _gameSearchCache = {}; // rawgId → result object
+
+// ── RAWG API ───────────────────────────────────────────────
+
+const rawgSearch = async query => {
+    if (!query || query.length < 2) return [];
+    try {
+        const res = await fetch(
+            `https://api.rawg.io/api/games?key=${RAWG_KEY}&search=${encodeURIComponent(query)}&page_size=6&search_precise=true`
+        );
+        if (!res.ok) return [];
+        const data = await res.json();
+        return data.results || [];
+    } catch {
+        return [];
+    }
+};
+
+// ── Modal helpers ──────────────────────────────────────────
+
+const gameResetAddModal = () => {
+    byId('game-search-input').value = '';
+    byId('game-search-results').innerHTML = '';
+    byId('game-search-results').style.display = 'none';
+    byId('game-selected-preview').style.display = 'none';
+    byId('game-selected-preview').innerHTML = '';
+    byId('gnew-rawg-id').value = '';
+    byId('gnew-cover').value = '';
+    byId('gnew-title').value = '';
+    byId('gnew-status').value = 'wishlist';
+    byId('gnew-rating').value = '';
+    byId('gnew-platform').value = '';
+    byId('gnew-notes').value = '';
+};
+
+const gameLiveSearch = () => {
+    clearTimeout(_gameSearchTimer);
+    const q = byId('game-search-input').value.trim();
+    const resultsEl = byId('game-search-results');
+    if (!q) { resultsEl.style.display = 'none'; resultsEl.innerHTML = ''; return; }
+    resultsEl.innerHTML = '<div class="gsr-loading">Searching…</div>';
+    resultsEl.style.display = 'block';
+    _gameSearchTimer = setTimeout(async () => {
+        const results = await rawgSearch(q);
+        if (!results.length) {
+            resultsEl.innerHTML = '<div class="gsr-loading">No results — you can add the title manually below.</div>';
+            return;
+        }
+        _gameSearchCache = {};
+        results.forEach(g => { _gameSearchCache[g.id] = g; });
+        resultsEl.innerHTML = results.map(g => `
+            <div class="gsr-item" onclick="window._games?.pickResult?.(${g.id})">
+                ${g.background_image
+                    ? `<img class="gsr-cover" src="${g.background_image}" alt="" loading="lazy" />`
+                    : `<div class="gsr-cover gsr-cover-ph">🎮</div>`}
+                <div class="gsr-info">
+                    <div class="gsr-name">${esc(g.name)}</div>
+                    <div class="gsr-meta">${g.released ? g.released.slice(0, 4) : ''}${g.platforms?.length ? ' · ' + g.platforms.slice(0, 3).map(p => p.platform.name).join(', ') : ''}</div>
+                </div>
+            </div>`).join('');
+    }, 350);
+};
+
+const gamePickResult = id => {
+    const g = _gameSearchCache[id];
+    if (!g) return;
+    byId('gnew-rawg-id').value = id;
+    byId('gnew-cover').value = g.background_image || '';
+    byId('gnew-title').value = g.name;
+    byId('game-search-input').value = g.name;
+    byId('game-search-results').style.display = 'none';
+
+    const platforms = g.platforms?.slice(0, 3).map(p => p.platform.name).join(', ') || '';
+    if (platforms && !byId('gnew-platform').value) byId('gnew-platform').value = platforms;
+
+    const preview = byId('game-selected-preview');
+    preview.style.display = 'flex';
+    preview.innerHTML = `
+        ${g.background_image ? `<img class="gsp-cover" src="${g.background_image}" alt="" />` : `<div class="gsp-cover gsp-ph">🎮</div>`}
+        <div class="gsp-info">
+            <div class="gsp-name">${esc(g.name)}</div>
+            <div class="gsp-meta">${g.released ? '📅 ' + g.released.slice(0, 4) : ''}${platforms ? ' · ' + platforms : ''}${g.metacritic ? ' · ⭐ ' + g.metacritic + '/100' : ''}</div>
+        </div>`;
+};
+
+// ── CRUD ───────────────────────────────────────────────────
+
+const createGame = () => {
+    const title = byId('gnew-title').value.trim();
+    if (!title) { byId('gnew-title').focus(); toast('❌ Enter a game title'); return; }
+    const rating = parseInt(byId('gnew-rating').value);
+    window._appState.games.push({
+        id: uid(),
+        rawgId: byId('gnew-rawg-id').value || null,
+        title,
+        cover: byId('gnew-cover').value || null,
+        status: byId('gnew-status').value,
+        rating: (rating >= 1 && rating <= 10) ? rating : null,
+        platform: byId('gnew-platform').value.trim() || null,
+        notes: byId('gnew-notes').value.trim() || null,
+        addedAt: Date.now()
+    });
+    S.set('gm2', window._appState.games);
+    closeModal();
+    renderGames();
+    toast('Game added 🎮');
+};
+
+const deleteGame = id => {
+    window._appState.games = window._appState.games.filter(g => g.id !== id);
+    S.set('gm2', window._appState.games);
+    renderGames();
+};
+
+const openEditGame = id => {
+    const g = window._appState.games.find(x => x.id === id);
+    if (!g) return;
+    byId('gedit-id').value = id;
+    byId('gedit-status').value = g.status;
+    byId('gedit-rating').value = g.rating || '';
+    byId('gedit-platform').value = g.platform || '';
+    byId('gedit-notes').value = g.notes || '';
+    const preview = byId('gedit-preview');
+    preview.innerHTML = `
+        ${g.cover ? `<img class="gsp-cover" src="${g.cover}" alt="" />` : `<div class="gsp-cover gsp-ph">🎮</div>`}
+        <div class="gsp-info">
+            <div class="gsp-name">${esc(g.title)}</div>
+            <div class="gsp-meta">${g.platform || ''}</div>
+        </div>`;
+    openModal('mg-edit');
+};
+
+const saveEditGame = () => {
+    const id = byId('gedit-id').value;
+    const g = window._appState.games.find(x => x.id === id);
+    if (!g) return;
+    const rating = parseInt(byId('gedit-rating').value);
+    g.status = byId('gedit-status').value;
+    g.rating = (rating >= 1 && rating <= 10) ? rating : null;
+    g.platform = byId('gedit-platform').value.trim() || null;
+    g.notes = byId('gedit-notes').value.trim() || null;
+    S.set('gm2', window._appState.games);
+    closeModal();
+    renderGames();
+    toast('Game updated 🎮');
+};
+
+const quickStatusChange = (id, status) => {
+    const g = window._appState.games.find(x => x.id === id);
+    if (!g) return;
+    g.status = status;
+    S.set('gm2', window._appState.games);
+    renderGames();
+};
+
+// ── Render ─────────────────────────────────────────────────
+
+const renderGames = () => {
+    const state = window._appState;
+    const games = state.games;
+
+    // Stats bar
+    const statsEl = byId('games-stats');
+    const counts = { wishlist: 0, playing: 0, completed: 0, dropped: 0 };
+    games.forEach(g => counts[g.status] = (counts[g.status] || 0) + 1);
+    statsEl.innerHTML = Object.entries(GAME_STATUSES).map(([k, v]) =>
+        `<div class="game-stat-pill" style="--pill-color:${v.color}">
+            <span class="game-stat-n">${counts[k] || 0}</span>
+            <span class="game-stat-lbl">${v.label}</span>
+         </div>`).join('');
+
+    // Filter by active tab
+    const q = (byId('games-search')?.value || '').toLowerCase();
+    let list = [...games];
+    if (_gameActiveTab !== 'all') list = list.filter(g => g.status === _gameActiveTab);
+    if (q) list = list.filter(g => g.title.toLowerCase().includes(q));
+
+    // Sort: playing first, then by addedAt desc
+    const order = { playing: 0, wishlist: 1, completed: 2, dropped: 3 };
+    list.sort((a, b) => (order[a.status] - order[b.status]) || (b.addedAt - a.addedAt));
+
+    const listEl = byId('games-list');
+    if (!list.length) {
+        listEl.innerHTML = `<div class="empty"><span class="empty-ic">🎮</span>${q ? 'No matching games.' : 'No games yet.<br>Hit <strong>+</strong> to add one.'}</div>`;
+        return;
+    }
+
+    listEl.innerHTML = list.map(g => {
+        const st = GAME_STATUSES[g.status];
+        const stars = g.rating ? '★'.repeat(g.rating) + '<span style="color:var(--border)">' + '★'.repeat(10 - g.rating) + '</span>' : '';
+        return `
+        <div class="game-card card">
+            ${g.cover
+                ? `<img class="game-cover" src="${g.cover}" alt="${esc(g.title)}" loading="lazy" />`
+                : `<div class="game-cover game-cover-ph">🎮</div>`}
+            <div class="game-body">
+                <div class="game-title">${esc(g.title)}</div>
+                <div class="game-meta">
+                    <span class="game-status-badge" style="background:${st.color}20;color:${st.color}">${st.label}</span>
+                    ${g.platform ? `<span class="game-platform">${esc(g.platform)}</span>` : ''}
+                </div>
+                ${g.rating ? `<div class="game-stars">${stars} <span style="font-size:11px;color:var(--t3);margin-left:4px">${g.rating}/10</span></div>` : ''}
+                ${g.notes ? `<div class="game-notes">${esc(g.notes)}</div>` : ''}
+                <div class="game-actions">
+                    <select class="game-status-select" onchange="window._games?.quickStatus?.('${g.id}', this.value)">
+                        ${Object.entries(GAME_STATUSES).map(([k, v]) =>
+                            `<option value="${k}"${g.status === k ? ' selected' : ''}>${v.label}</option>`
+                        ).join('')}
+                    </select>
+                    <button class="ico-btn" onclick="window._games?.edit?.('${g.id}')" title="Edit">✎</button>
+                    <button class="ico-btn" onclick="window._games?.delete?.('${g.id}')">🗑</button>
+                </div>
+            </div>
+        </div>`;
+    }).join('');
+};
+
+const gamesSetTab = tab => {
+    _gameActiveTab = tab;
+    queryAll('.games-tab').forEach(b => b.classList.toggle('active', b.dataset.status === tab));
+    renderGames();
+};
+
+const gamesSearch = () => renderGames();
+
+// Tab click listeners
+queryAll('.games-tab').forEach(btn => {
+    btn.addEventListener('click', () => gamesSetTab(btn.dataset.status));
+});
+
+window._games = {
+    create: createGame,
+    delete: deleteGame,
+    edit: openEditGame,
+    saveEdit: saveEditGame,
+    liveSearch: gameLiveSearch,
+    pickResult: gamePickResult,
+    quickStatus: quickStatusChange,
+    search: gamesSearch
+};
 
 // ══════════════════════════════════════════════════════════
 // GROCERY
