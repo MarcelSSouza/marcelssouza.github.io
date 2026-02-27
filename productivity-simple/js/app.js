@@ -108,7 +108,7 @@ document.addEventListener('click', (e) => {
 // UTILITIES - EXPORT TO WINDOW
 // ══════════════════════════════════════════════════════════
 
-window._utils = { closeModal, toast };
+window._utils = { closeModal, openModal, toast };
 window._darkMode = darkMode;
 window._auth = { action: authAction };
 window._nav = nav;
@@ -264,7 +264,10 @@ const saveEditHabit = () => {
 
 const hStreak = id => {
     let n = 0, d = new Date();
-    d.setDate(d.getDate() - 1);
+    // Include today if already checked in
+    if (!window._appState.hlog[d.toISOString().slice(0, 10) + ':' + id]) {
+        d.setDate(d.getDate() - 1);
+    }
     while (window._appState.hlog[d.toISOString().slice(0, 10) + ':' + id]) {
         n++;
         d.setDate(d.getDate() - 1);
@@ -316,6 +319,10 @@ window._habits = { create: createHabit, toggle: toggleHabit, delete: deleteHabit
 
 byId('hname').addEventListener('keydown', e => {
     if (e.key === 'Enter') createHabit();
+});
+
+byId('hname-edit').addEventListener('keydown', e => {
+    if (e.key === 'Enter') saveEditHabit();
 });
 
 // ══════════════════════════════════════════════════════════
@@ -440,6 +447,10 @@ window._todos = { create: createTodo, toggle: toggleTodo, delete: deleteTodo, ed
 
 byId('ttitle').addEventListener('keydown', e => {
     if (e.key === 'Enter') createTodo();
+});
+
+byId('ttitle-edit').addEventListener('keydown', e => {
+    if (e.key === 'Enter') saveEditTodo();
 });
 
 // ══════════════════════════════════════════════════════════
