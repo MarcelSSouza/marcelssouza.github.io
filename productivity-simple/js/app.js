@@ -225,6 +225,43 @@ const deleteHabit = id => {
     renderHabits();
 };
 
+const openEditHabit = id => {
+    const h = window._appState.habits.find(x => x.id === id);
+    if (!h) return;
+    byId('hedit-id').value = id;
+    byId('hname-edit').value = h.name;
+    window._appState.selColor = h.color;
+    renderSwatchesEdit();
+    openModal('mh-edit');
+};
+
+const renderSwatchesEdit = () => {
+    const c = byId('hswatches-edit');
+    if (!c) return;
+    c.innerHTML = '';
+    COLORS.forEach(col => {
+        const s = document.createElement('div');
+        s.className = 'sw' + (col === window._appState.selColor ? ' sel' : '');
+        s.style.background = col;
+        s.onclick = () => { window._appState.selColor = col; renderSwatchesEdit(); };
+        c.appendChild(s);
+    });
+};
+
+const saveEditHabit = () => {
+    const id = byId('hedit-id').value;
+    const h = window._appState.habits.find(x => x.id === id);
+    if (!h) return;
+    const name = byId('hname-edit').value.trim();
+    if (!name) return;
+    h.name = name;
+    h.color = window._appState.selColor;
+    S.set('h2', window._appState.habits);
+    closeModal();
+    renderHabits();
+    toast('Habit updated 🔥');
+};
+
 const hStreak = id => {
     let n = 0, d = new Date();
     d.setDate(d.getDate() - 1);
@@ -267,12 +304,15 @@ const renderHabits = () => {
       </div>
       <div class="hmeta">🔥 ${streak} day streak &nbsp;·&nbsp; ${l30.filter(Boolean).length}/30 this month</div>
       <div class="hhm">${l30.map(v => `<div class="hc" style="background:${v ? h.color : 'var(--border)'};opacity:${v ? 1 : .35}"></div>`).join('')}</div>
-      <div style="display:flex;justify-content:flex-end"><button class="ico-btn" onclick="window._habits?.delete?.('${h.id}')">🗑</button></div>`;
+      <div style="display:flex;justify-content:flex-end;gap:4px">
+        <button class="ico-btn" onclick="window._habits?.edit?.('${h.id}')" title="Edit">✎</button>
+        <button class="ico-btn" onclick="window._habits?.delete?.('${h.id}')">🗑</button>
+      </div>`;
         g.appendChild(card);
     });
 };
 
-window._habits = { create: createHabit, toggle: toggleHabit, delete: deleteHabit };
+window._habits = { create: createHabit, toggle: toggleHabit, delete: deleteHabit, edit: openEditHabit, saveEdit: saveEditHabit };
 
 byId('hname').addEventListener('keydown', e => {
     if (e.key === 'Enter') createHabit();
@@ -314,6 +354,31 @@ const deleteTodo = id => {
     renderTodos();
 };
 
+const openEditTodo = id => {
+    const t = window._appState.todos.find(x => x.id === id);
+    if (!t) return;
+    byId('tedit-id').value = id;
+    byId('ttitle-edit').value = t.title;
+    byId('tpri-edit').value = t.priority || 'none';
+    byId('tdue-edit').value = t.due || '';
+    openModal('mt-edit');
+};
+
+const saveEditTodo = () => {
+    const id = byId('tedit-id').value;
+    const t = window._appState.todos.find(x => x.id === id);
+    if (!t) return;
+    const title = byId('ttitle-edit').value.trim();
+    if (!title) return;
+    t.title = title;
+    t.priority = byId('tpri-edit').value;
+    t.due = byId('tdue-edit').value || null;
+    S.set('t2', window._appState.todos);
+    closeModal();
+    renderTodos();
+    toast('Task updated ✅');
+};
+
 const dueBadge = (due, done) => {
     if (!due) return '';
     const d = ddiff(due);
@@ -323,17 +388,40 @@ const dueBadge = (due, done) => {
     return `<span class="chip ck">${fdate(due)}</span>`;
 };
 
+const todoSearch = () => renderTodos();
+const todoApplyFilter = () => renderTodos();
+
 const renderTodos = () => {
     const state = window._appState;
     const el = byId('tlist');
+    const q = (byId('todo-search')?.value || '').toLowerCase();
+    const filter = byId('todo-filter')?.value || 'all';
+
     if (!state.todos.length) {
         el.innerHTML = `<div class="empty"><span class="empty-ic">✅</span>No tasks yet.<br>Hit <strong>+</strong> to add one.</div>`;
         return;
     }
+
     const po = { high: 0, medium: 1, low: 2, none: 3 };
+    let list = [...state.todos];
+
+    // Filter
+    if (filter === 'active') list = list.filter(x => !x.done);
+    else if (filter === 'done') list = list.filter(x => x.done);
+    else if (filter === 'high') list = list.filter(x => x.priority === 'high');
+    else if (filter === 'overdue') list = list.filter(x => !x.done && x.due && ddiff(x.due) < 0);
+
+    // Search
+    if (q) list = list.filter(x => x.title.toLowerCase().includes(q));
+
+    if (!list.length) {
+        el.innerHTML = `<div class="empty"><span class="empty-ic">🔍</span>No matching tasks.</div>`;
+        return;
+    }
+
     const sorted = [
-        ...state.todos.filter(x => !x.done).sort((a, b) => (po[a.priority] || 3) - (po[b.priority] || 3)),
-        ...state.todos.filter(x => x.done)
+        ...list.filter(x => !x.done).sort((a, b) => (po[a.priority] || 3) - (po[b.priority] || 3)),
+        ...list.filter(x => x.done)
     ];
     el.innerHTML = sorted.map(t => `
     <div class="ti">
@@ -343,11 +431,12 @@ const renderTodos = () => {
         ${t.priority !== 'none' ? `<span class="chip c${t.priority[0]}">${t.priority}</span>` : ''}
         ${dueBadge(t.due, t.done)}
       </div>
+      <button class="ico-btn" onclick="window._todos?.edit?.('${t.id}')" title="Edit">✎</button>
       <button class="ico-btn" onclick="window._todos?.delete?.('${t.id}')">×</button>
     </div>`).join('');
 };
 
-window._todos = { create: createTodo, toggle: toggleTodo, delete: deleteTodo };
+window._todos = { create: createTodo, toggle: toggleTodo, delete: deleteTodo, edit: openEditTodo, saveEdit: saveEditTodo, search: todoSearch, applyFilter: todoApplyFilter };
 
 byId('ttitle').addEventListener('keydown', e => {
     if (e.key === 'Enter') createTodo();
@@ -708,6 +797,12 @@ const expSetFilter = c => {
     renderExpenses();
 };
 
+const expSetBudget = () => {
+    const val = parseFloat(byId('exp-budget-input').value) || 0;
+    S.set('exp-budget', val);
+    renderExpenses();
+};
+
 const renderExpenses = () => {
     const state = window._appState;
     const tot = state.expenses.reduce((s, x) => s + x.amount, 0);
@@ -715,6 +810,29 @@ const renderExpenses = () => {
     byId('exp-total').textContent = fmt$(tot);
     byId('exp-month').textContent = fmt$(mon);
     byId('exp-count').textContent = state.expenses.length;
+
+    // Budget bar
+    const budget = S.get('exp-budget', 0);
+    const budgetInput = byId('exp-budget-input');
+    if (budgetInput && !budgetInput.matches(':focus')) budgetInput.value = budget || '';
+    const fill = byId('exp-budget-fill');
+    const msg = byId('exp-budget-msg');
+    if (fill && msg) {
+        if (budget > 0) {
+            const pct = Math.min(mon / budget * 100, 100);
+            fill.style.width = pct + '%';
+            fill.style.background = pct >= 100 ? 'var(--red)' : pct >= 80 ? 'var(--yellow)' : 'linear-gradient(90deg,var(--green),var(--primary))';
+            const left = budget - mon;
+            msg.textContent = left >= 0
+                ? `$${left.toFixed(2)} remaining of $${budget.toFixed(2)} budget (${Math.round(pct)}% used)`
+                : `Over budget by $${Math.abs(left).toFixed(2)}!`;
+            msg.style.color = pct >= 100 ? 'var(--red)' : pct >= 80 ? 'var(--yellow)' : 'var(--t3)';
+        } else {
+            fill.style.width = '0%';
+            msg.textContent = 'Enter a monthly budget above to track spending.';
+            msg.style.color = 'var(--t3)';
+        }
+    }
     const cats = ['All', ...new Set(state.expenses.map(x => x.cat))];
     byId('exp-filters').innerHTML = cats.map(c => `<button class="fchip${c === state.expFilter ? ' active' : ''}" onclick="window._expenses?.setFilter?.('${esc(c)}')">${esc(c)}</button>`).join('');
     const filtered = state.expFilter === 'All' ? state.expenses : state.expenses.filter(x => x.cat === state.expFilter);
@@ -737,7 +855,7 @@ const renderExpenses = () => {
     </div>`).join('');
 };
 
-window._expenses = { create: createExpense, delete: deleteExpense, setFilter: expSetFilter };
+window._expenses = { create: createExpense, delete: deleteExpense, setFilter: expSetFilter, setBudget: expSetBudget };
 
 byId('xdesc').addEventListener('keydown', e => {
     if (e.key === 'Enter') createExpense();
@@ -811,9 +929,13 @@ const renderNotesMeta = () => {
     renderNotes(false);
 };
 
+const noteSearch = () => renderNotes(false);
+
 const renderNotes = (resetEditor = true) => {
     const state = window._appState;
     const list = byId('notes-list');
+    const q = (byId('note-search')?.value || '').toLowerCase();
+
     if (!state.notes.length) {
         list.innerHTML = `<div class="empty" style="padding:40px 20px"><span class="empty-ic">📝</span>No notes yet</div>`;
         if (resetEditor) {
@@ -822,7 +944,15 @@ const renderNotes = (resetEditor = true) => {
         }
         return;
     }
-    const sorted = [...state.notes].sort((a, b) => b.updatedAt - a.updatedAt);
+
+    let sorted = [...state.notes].sort((a, b) => b.updatedAt - a.updatedAt);
+    if (q) sorted = sorted.filter(n => n.title.toLowerCase().includes(q) || (n.body || '').toLowerCase().includes(q));
+
+    if (!sorted.length) {
+        list.innerHTML = `<div class="empty" style="padding:40px 20px"><span class="empty-ic">🔍</span>No matching notes</div>`;
+        return;
+    }
+
     list.innerHTML = sorted.map(n => `
     <div class="note-item${n.id === state.activeNote ? ' active' : ''}" onclick="window._notes?.select?.('${n.id}')">
       <div class="note-title-row">
@@ -833,7 +963,7 @@ const renderNotes = (resetEditor = true) => {
     </div>`).join('');
 };
 
-window._notes = { save: noteSave, delete: noteDelete, select: selectNote };
+window._notes = { save: noteSave, delete: noteDelete, select: selectNote, search: noteSearch };
 
 // ══════════════════════════════════════════════════════════
 // GROCERY

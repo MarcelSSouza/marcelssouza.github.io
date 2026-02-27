@@ -982,6 +982,41 @@ canvas {
 .exp-amt.pos {
   color: var(--green);
 }
+/* ─── Search & filter toolbar ───────────────────────────── */
+.search-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--r);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 13.5px;
+  transition: border-color var(--ease);
+}
+.search-input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+.todo-toolbar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+  align-items: center;
+}
+.todo-toolbar .search-input {
+  flex: 1;
+}
+.todo-toolbar select {
+  padding: 8px 10px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--r);
+  background: var(--surface);
+  color: var(--t2);
+  font-size: 13px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
 .filter-row {
   display: flex;
   gap: 8px;
