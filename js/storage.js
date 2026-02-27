@@ -372,6 +372,12 @@ export const dbLoad = async () => {
                     if (d.games !== undefined) {
                         state.games = d.games;
                         localStorage.setItem('gm2', JSON.stringify(d.games));
+                    } else if (state.games?.length) {
+                        // games field missing from Firestore — migrate local data up
+                        console.log('🆕 Migrating local games to Firestore...');
+                        _db.collection('users').doc(_currentUser.uid).set(
+                            { games: state.games }, { merge: true }
+                        ).catch(e => console.error('games migration failed:', e));
                     }
 
                     // Re-render with updated data
