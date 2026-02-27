@@ -602,6 +602,93 @@ let pRun = false;
 let pInt = null;
 let pSess = 0;
 
+// ── Noise Engine ──────────────────────────────────────────
+let _noiseCtx = null;
+let _noiseSource = null;
+let _noiseGain = null;
+let _noiseType = S.get('noise-type', 'off');
+let _noiseVol = S.get('noise-vol', 30);
+
+const _createNoise = type => {
+    if (!_noiseCtx) _noiseCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const ctx = _noiseCtx;
+    const bufLen = ctx.sampleRate * 2;
+    const buf = ctx.createBuffer(1, bufLen, ctx.sampleRate);
+    const data = buf.getChannelData(0);
+
+    if (type === 'white') {
+        for (let i = 0; i < bufLen; i++) data[i] = Math.random() * 2 - 1;
+    } else if (type === 'brown') {
+        let last = 0;
+        for (let i = 0; i < bufLen; i++) {
+            const w = Math.random() * 2 - 1;
+            data[i] = (last + 0.02 * w) / 1.02;
+            last = data[i];
+            data[i] *= 3.5;
+        }
+    } else if (type === 'pink') {
+        let b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0;
+        for (let i = 0; i < bufLen; i++) {
+            const w = Math.random() * 2 - 1;
+            b0=0.99886*b0+w*0.0555179; b1=0.99332*b1+w*0.0750759;
+            b2=0.96900*b2+w*0.1538520; b3=0.86650*b3+w*0.3104856;
+            b4=0.55000*b4+w*0.5329522; b5=-0.7616*b5-w*0.0168980;
+            data[i] = (b0+b1+b2+b3+b4+b5+b6+w*0.5362) * 0.11;
+            b6 = w * 0.115926;
+        }
+    }
+
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    src.loop = true;
+    const gain = ctx.createGain();
+    gain.gain.value = _noiseVol / 100 * 0.4;
+    src.connect(gain);
+    gain.connect(ctx.destination);
+    return { src, gain };
+};
+
+const _stopNoise = () => {
+    if (_noiseSource) { try { _noiseSource.stop(); } catch(_) {} _noiseSource = null; }
+    _noiseGain = null;
+};
+
+const noiseSetType = type => {
+    _noiseType = type;
+    S.set('noise-type', type);
+    // Update button styles
+    ['off','white','brown','pink'].forEach(t => {
+        const btn = byId('noise-' + t);
+        if (btn) {
+            btn.style.background = t === type ? 'var(--primary)' : '';
+            btn.style.color = t === type ? '#fff' : '';
+            btn.style.borderColor = t === type ? 'var(--primary)' : '';
+        }
+    });
+    _stopNoise();
+    if (type !== 'off' && pRun) {
+        const { src, gain } = _createNoise(type);
+        _noiseSource = src;
+        _noiseGain = gain;
+        src.start();
+    }
+};
+
+const noiseSetVol = () => {
+    _noiseVol = parseInt(byId('noise-vol')?.value || 30);
+    S.set('noise-vol', _noiseVol);
+    byId('noise-vol-lbl').textContent = _noiseVol + '%';
+    if (_noiseGain) _noiseGain.gain.value = _noiseVol / 100 * 0.4;
+};
+
+const noiseApplyState = () => {
+    // Restore button state on page load
+    const vol = byId('noise-vol');
+    if (vol) vol.value = _noiseVol;
+    byId('noise-vol-lbl').textContent = _noiseVol + '%';
+    noiseSetType(_noiseType);
+};
+
 const pomSetMode = m => {
     if (pRun) pomStop();
     pMode = m;
@@ -619,6 +706,13 @@ const pomStart = () => {
     byId('pbtn').textContent = '⏸';
     byId('ptime').classList.add('running');
     pInt = setInterval(pomTick, 1000);
+    // Start noise if selected
+    if (_noiseType !== 'off' && !_noiseSource) {
+        const { src, gain } = _createNoise(_noiseType);
+        _noiseSource = src;
+        _noiseGain = gain;
+        src.start();
+    }
 };
 
 const pomStop = () => {
@@ -626,6 +720,7 @@ const pomStop = () => {
     byId('pbtn').textContent = '▶';
     byId('ptime').classList.remove('running');
     clearInterval(pInt);
+    _stopNoise();
 };
 
 const pomReset = () => {
@@ -685,7 +780,7 @@ const pomApplySettings = () => {
 if (Notification && Notification.permission === 'default')
     Notification.requestPermission();
 
-window._pomodoro = { setMode: pomSetMode, toggle: pomToggle, reset: pomReset, skip: pomSkip, applySettings: pomApplySettings };
+window._pomodoro = { setMode: pomSetMode, toggle: pomToggle, reset: pomReset, skip: pomSkip, applySettings: pomApplySettings, setNoise: noiseSetType, setNoiseVol: noiseSetVol };
 
 // ══════════════════════════════════════════════════════════
 // EXPENSES
@@ -1185,44 +1280,37 @@ const contactForm = {
             return;
         }
 
-        // Prepare the email
-        const emailBody = `
-Subject: ${subject}
+        const submitBtn = byId('submit-contact');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Sending…';
 
-From: ${email}
-
-Message:
-${message}
-
----
-App Version: ${byId('contact-version').value}
-Sent: ${new Date().toLocaleString()}
-        `.trim();
-
-        // Use FormSubmit.co to send email
-        const formData = new FormData();
-        formData.append('email', email);
-        formData.append('subject', subject);
-        formData.append('message', message);
-        formData.append('version', byId('contact-version').value);
-        formData.append('_captcha', 'false');
-        formData.append('_next', window.location.href);
-
-        // Send to FormSubmit.co
         fetch('https://formspree.io/f/myzojlwp', {
             method: 'POST',
-            body: formData
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({
+                email,
+                subject,
+                message,
+                version: byId('contact-version').value,
+                sent: new Date().toLocaleString()
+            })
         })
-            .then(response => {
-                if (response.ok) {
+            .then(response => response.json().then(data => ({ ok: response.ok, data })))
+            .then(({ ok, data }) => {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Send Report';
+                if (ok) {
                     toast('✅ Report sent! Thank you for your feedback.');
                     form.reset();
-                    closeModal('contact');
+                    closeModal();
                 } else {
+                    console.error('Formspree error:', data);
                     toast('❌ Failed to send. Please try again.');
                 }
             })
             .catch(err => {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Send Report';
                 console.error('Email send error:', err);
                 toast('❌ Network error. Please try again.');
             });
@@ -1238,6 +1326,7 @@ byId('contact-form')?.addEventListener('submit', (e) => contactForm.submit(e));
 
 renderSwatches();
 pomSetMode('work');
+noiseApplyState();
 byId('note-editor').style.display = 'none';
 darkMode.apply();
 settings.updateUI();

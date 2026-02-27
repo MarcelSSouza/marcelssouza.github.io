@@ -867,6 +867,21 @@ textarea {
   gap: 12px;
   padding: 18px;
 }
+.noise-btn {
+  padding: 5px 14px;
+  border-radius: 999px;
+  border: 1.5px solid var(--border);
+  background: none;
+  color: var(--t2);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--ease);
+}
+.noise-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
 .pset {
   display: flex;
   align-items: center;
@@ -984,7 +999,9 @@ canvas {
 }
 /* ─── Search & filter toolbar ───────────────────────────── */
 .search-input {
+  display: block;
   width: 100%;
+  box-sizing: border-box;
   padding: 8px 12px;
   border: 1.5px solid var(--border);
   border-radius: var(--r);
@@ -1001,12 +1018,15 @@ canvas {
   display: flex;
   gap: 8px;
   margin-bottom: 14px;
-  align-items: center;
+  align-items: stretch;
 }
 .todo-toolbar .search-input {
-  flex: 1;
+  flex: 1 1 0;
+  min-width: 0;
+  width: auto;
 }
 .todo-toolbar select {
+  flex: 0 0 auto;
   padding: 8px 10px;
   border: 1.5px solid var(--border);
   border-radius: var(--r);
@@ -1014,7 +1034,6 @@ canvas {
   color: var(--t2);
   font-size: 13px;
   cursor: pointer;
-  flex-shrink: 0;
 }
 
 .filter-row {

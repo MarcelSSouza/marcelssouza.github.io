@@ -183,6 +183,22 @@
                 ⏭
               </button>
             </div>
+            <div class="card psettings" style="margin-bottom:12px">
+              <div style="font-size:12px;font-weight:700;color:var(--t3);letter-spacing:0.5px;margin-bottom:8px">BACKGROUND NOISE</div>
+              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+                <button class="noise-btn" id="noise-off" onclick="window._pomodoro?.setNoise?.('off')" style="background:var(--primary);color:#fff">Off</button>
+                <button class="noise-btn" id="noise-white" onclick="window._pomodoro?.setNoise?.('white')">White</button>
+                <button class="noise-btn" id="noise-brown" onclick="window._pomodoro?.setNoise?.('brown')">Brown</button>
+                <button class="noise-btn" id="noise-pink" onclick="window._pomodoro?.setNoise?.('pink')">Pink</button>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;margin-top:10px">
+                <span style="font-size:12px;color:var(--t3)">Vol</span>
+                <input type="range" id="noise-vol" min="0" max="100" value="30"
+                  style="flex:1;accent-color:var(--primary)"
+                  oninput="window._pomodoro?.setNoiseVol?.()" />
+                <span id="noise-vol-lbl" style="font-size:12px;color:var(--t3);width:28px">30%</span>
+              </div>
+            </div>
             <div class="card psettings">
               <div
                 style="
