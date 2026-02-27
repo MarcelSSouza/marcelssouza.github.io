@@ -3,9 +3,6 @@
  * Handles data persistence and cloud sync
  */
 
-// Import toast for notifications
-let _toast = null;
-
 let _currentUser = null;
 let _db = null;
 let _auth = null;
@@ -19,14 +16,14 @@ let _firestoreListener = null; // Real-time listener
 
 // Map localStorage keys → Firestore field names
 const KEY_TO_FIELD = {
-    'h2': 'habits',
-    'hl2': 'hlog',
-    't2': 'todos',
-    'ev2': 'calEvents',
-    'ex2': 'expenses',
-    'nt2': 'notes',
-    'gr2': 'grocery',
-    'gm2': 'games'
+    h2: 'habits',
+    hl2: 'hlog',
+    t2: 'todos',
+    ev2: 'calEvents',
+    ex2: 'expenses',
+    nt2: 'notes',
+    gr2: 'grocery',
+    gm2: 'games',
 };
 
 export const S = {
@@ -44,7 +41,7 @@ export const S = {
             const field = KEY_TO_FIELD[k];
             if (field) dbSave(field, v);
         }
-    }
+    },
 };
 
 // ──────────────────────────────────────────────────────────
@@ -73,13 +70,13 @@ export const initFirebase = () => {
             return;
         }
 
-        const fbApp = firebase.initializeApp({
-            apiKey: "AIzaSyC5r6j4k3Nxduv4V4fEzjRrcV3_y3ohkrQ",
-            authDomain: "focus-81bf0.firebaseapp.com",
-            projectId: "focus-81bf0",
-            storageBucket: "focus-81bf0.firebasestorage.app",
-            messagingSenderId: "216712938115",
-            appId: "1:216712938115:web:88ec80640f96b1dcfe11b6"
+        firebase.initializeApp({
+            apiKey: 'AIzaSyC5r6j4k3Nxduv4V4fEzjRrcV3_y3ohkrQ',
+            authDomain: 'focus-81bf0.firebaseapp.com',
+            projectId: 'focus-81bf0',
+            storageBucket: 'focus-81bf0.firebasestorage.app',
+            messagingSenderId: '216712938115',
+            appId: '1:216712938115:web:88ec80640f96b1dcfe11b6',
         });
 
         _db = firebase.firestore();
@@ -94,30 +91,33 @@ export const initFirebase = () => {
 
 const setupAuthListener = () => {
     // Complete redirect sign-in on return (mobile)
-    _auth.getRedirectResult().then(async (result) => {
-        if (result.user) {
-            _currentUser = result.user;
-            const existing = await _db.collection('users').doc(result.user.uid).get();
-            if (!existing.exists && window._appState) {
-                console.log('🆕 New account (redirect), migrating local data to Firestore...');
-                await _db.collection('users').doc(result.user.uid).set({
-                    habits: window._appState.habits,
-                    hlog: window._appState.hlog,
-                    todos: window._appState.todos,
-                    calEvents: window._appState.calEvents,
-                    expenses: window._appState.expenses,
-                    notes: window._appState.notes,
-                    grocery: window._appState.grocery,
-                    games: window._appState.games
-                });
+    _auth
+        .getRedirectResult()
+        .then(async (result) => {
+            if (result.user) {
+                _currentUser = result.user;
+                const existing = await _db.collection('users').doc(result.user.uid).get();
+                if (!existing.exists && window._appState) {
+                    console.log('🆕 New account (redirect), migrating local data to Firestore...');
+                    await _db.collection('users').doc(result.user.uid).set({
+                        habits: window._appState.habits,
+                        hlog: window._appState.hlog,
+                        todos: window._appState.todos,
+                        calEvents: window._appState.calEvents,
+                        expenses: window._appState.expenses,
+                        notes: window._appState.notes,
+                        grocery: window._appState.grocery,
+                        games: window._appState.games,
+                    });
+                }
+                (window._utils?.toast || (() => {}))('✓ Signed in! Data synced');
             }
-            (window._utils?.toast || (() => {}))('✓ Signed in! Data synced');
-        }
-        setAuthLoading(false);
-    }).catch(e => {
-        setAuthLoading(false);
-        if (e.code !== 'auth/popup-closed-by-user') console.error('Redirect sign-in error:', e);
-    });
+            setAuthLoading(false);
+        })
+        .catch((e) => {
+            setAuthLoading(false);
+            if (e.code !== 'auth/popup-closed-by-user') console.error('Redirect sign-in error:', e);
+        });
 
     _auth.onAuthStateChanged(async (user) => {
         console.log('🔐 Auth state changed:', user?.email || user?.uid || 'none');
@@ -149,7 +149,7 @@ export const getAuth = () => _auth;
 // Firebase Auth Handlers
 // ──────────────────────────────────────────────────────────
 
-export const updateAuthUI = user => {
+export const updateAuthUI = (user) => {
     const ic = document.getElementById('auth-ic');
     const label = document.getElementById('auth-label');
     const btn = document.getElementById('auth-btn');
@@ -211,9 +211,7 @@ export const authAction = async () => {
         const avatarEl = document.getElementById('logout-avatar');
         const infoEl = document.getElementById('logout-user-info');
         if (avatarEl) {
-            avatarEl.innerHTML = user.photoURL
-                ? `<img src="${user.photoURL}" referrerpolicy="no-referrer" />`
-                : '👤';
+            avatarEl.innerHTML = user.photoURL ? `<img src="${user.photoURL}" referrerpolicy="no-referrer" />` : '👤';
         }
         if (infoEl) {
             const name = user.displayName || user.email || 'your account';
@@ -258,7 +256,7 @@ export const authAction = async () => {
                     expenses: state.expenses,
                     notes: state.notes,
                     grocery: state.grocery,
-                    games: state.games
+                    games: state.games,
                 });
                 console.log('✓ Local data migrated to Firestore');
             }
@@ -330,11 +328,13 @@ export const dbSave = (field, value) => {
         console.log('💾 Saving to Firebase (fields):', Object.keys(updates));
 
         // Use set with merge:true — creates doc if missing, updates only specified fields if it exists
-        _db.collection('users').doc(_currentUser.uid).set(updates, { merge: true })
+        _db.collection('users')
+            .doc(_currentUser.uid)
+            .set(updates, { merge: true })
             .then(() => {
                 console.log('✓ Saved to Firebase successfully');
             })
-            .catch(e => {
+            .catch((e) => {
                 console.error('Firestore save failed:', e);
             });
     }, 800);
@@ -356,90 +356,97 @@ export const dbLoad = async () => {
         console.log('📥 Setting up real-time listener for user:', _currentUser.uid);
 
         // Set up real-time listener with onSnapshot
-        _firestoreListener = _db.collection('users').doc(_currentUser.uid).onSnapshot(
-            (snap) => {
-                if (snap.exists) {
-                    const d = snap.data();
-                    const state = window._appState;
+        _firestoreListener = _db
+            .collection('users')
+            .doc(_currentUser.uid)
+            .onSnapshot(
+                (snap) => {
+                    if (snap.exists) {
+                        const d = snap.data();
+                        const state = window._appState;
 
-                    // Prevent infinite update loop
-                    _isLoadingFromFirebase = true;
+                        // Prevent infinite update loop
+                        _isLoadingFromFirebase = true;
 
-                    console.log('🔄 Real-time update received:', {
-                        notes: d.notes?.length || 0,
-                        todos: d.todos?.length || 0,
-                        grocery: d.grocery?.length || 0,
-                        habits: d.habits?.length || 0
-                    });
+                        console.log('🔄 Real-time update received:', {
+                            notes: d.notes?.length || 0,
+                            todos: d.todos?.length || 0,
+                            grocery: d.grocery?.length || 0,
+                            habits: d.habits?.length || 0,
+                        });
 
-                    // Update all data from Firebase
-                    if (d.habits !== undefined) {
-                        state.habits = d.habits;
-                        localStorage.setItem('h2', JSON.stringify(d.habits));
-                    }
-                    if (d.hlog !== undefined) {
-                        state.hlog = d.hlog;
-                        localStorage.setItem('hl2', JSON.stringify(d.hlog));
-                    }
-                    if (d.todos !== undefined) {
-                        state.todos = d.todos;
-                        localStorage.setItem('t2', JSON.stringify(d.todos));
-                    }
-                    if (d.calEvents !== undefined) {
-                        state.calEvents = d.calEvents;
-                        localStorage.setItem('ev2', JSON.stringify(d.calEvents));
-                    }
-                    if (d.expenses !== undefined) {
-                        state.expenses = d.expenses;
-                        localStorage.setItem('ex2', JSON.stringify(d.expenses));
-                    }
-                    if (d.notes !== undefined) {
-                        state.notes = d.notes;
-                        localStorage.setItem('nt2', JSON.stringify(d.notes));
-                    }
-                    if (d.grocery !== undefined) {
-                        state.grocery = d.grocery;
-                        localStorage.setItem('gr2', JSON.stringify(d.grocery));
-                    }
-                    if (d.games !== undefined && Array.isArray(d.games)) {
-                        state.games = d.games;
-                        localStorage.setItem('gm2', JSON.stringify(d.games));
-                    } else if (d.games === null && state.games?.length) {
-                        // Firestore returned null — keep local data, migrate up
-                        // games field missing from Firestore — migrate local data up
-                        console.log('🆕 Migrating local games to Firestore...');
-                        _db.collection('users').doc(_currentUser.uid).set(
-                            { games: state.games }, { merge: true }
-                        ).catch(e => console.error('games migration failed:', e));
-                    }
+                        // Update all data from Firebase
+                        if (d.habits !== undefined) {
+                            state.habits = d.habits;
+                            localStorage.setItem('h2', JSON.stringify(d.habits));
+                        }
+                        if (d.hlog !== undefined) {
+                            state.hlog = d.hlog;
+                            localStorage.setItem('hl2', JSON.stringify(d.hlog));
+                        }
+                        if (d.todos !== undefined) {
+                            state.todos = d.todos;
+                            localStorage.setItem('t2', JSON.stringify(d.todos));
+                        }
+                        if (d.calEvents !== undefined) {
+                            state.calEvents = d.calEvents;
+                            localStorage.setItem('ev2', JSON.stringify(d.calEvents));
+                        }
+                        if (d.expenses !== undefined) {
+                            state.expenses = d.expenses;
+                            localStorage.setItem('ex2', JSON.stringify(d.expenses));
+                        }
+                        if (d.notes !== undefined) {
+                            state.notes = d.notes;
+                            localStorage.setItem('nt2', JSON.stringify(d.notes));
+                        }
+                        if (d.grocery !== undefined) {
+                            state.grocery = d.grocery;
+                            localStorage.setItem('gr2', JSON.stringify(d.grocery));
+                        }
+                        if (d.games !== undefined && Array.isArray(d.games)) {
+                            state.games = d.games;
+                            localStorage.setItem('gm2', JSON.stringify(d.games));
+                        } else if (d.games === null && state.games?.length) {
+                            // Firestore returned null — keep local data, migrate up
+                            // games field missing from Firestore — migrate local data up
+                            console.log('🆕 Migrating local games to Firestore...');
+                            _db.collection('users')
+                                .doc(_currentUser.uid)
+                                .set({ games: state.games }, { merge: true })
+                                .catch((e) => console.error('games migration failed:', e));
+                        }
 
-                    // Re-render with updated data
-                    if (window._render) {
-                        window._render();
-                        console.log('✓ UI updated with latest data');
-                    }
+                        // Re-render with updated data
+                        if (window._render) {
+                            window._render();
+                            console.log('✓ UI updated with latest data');
+                        }
 
+                        _isLoadingFromFirebase = false;
+                    } else {
+                        console.log('No cloud data found, creating new document');
+                        const state = window._appState;
+                        _db.collection('users')
+                            .doc(_currentUser.uid)
+                            .set({
+                                habits: state.habits,
+                                hlog: state.hlog,
+                                todos: state.todos,
+                                calEvents: state.calEvents,
+                                expenses: state.expenses,
+                                notes: state.notes,
+                                grocery: state.grocery,
+                                games: state.games,
+                            })
+                            .catch((e) => console.error('Firestore create failed:', e));
+                    }
+                },
+                (error) => {
+                    console.error('❌ Firestore listener error:', error);
                     _isLoadingFromFirebase = false;
-                } else {
-                    console.log('No cloud data found, creating new document');
-                    const state = window._appState;
-                    _db.collection('users').doc(_currentUser.uid).set({
-                        habits: state.habits,
-                        hlog: state.hlog,
-                        todos: state.todos,
-                        calEvents: state.calEvents,
-                        expenses: state.expenses,
-                        notes: state.notes,
-                        grocery: state.grocery,
-                        games: state.games
-                    }).catch(e => console.error('Firestore create failed:', e));
                 }
-            },
-            (error) => {
-                console.error('❌ Firestore listener error:', error);
-                _isLoadingFromFirebase = false;
-            }
-        );
+            );
     } catch (e) {
         console.error('❌ Error setting up listener:', e);
     }

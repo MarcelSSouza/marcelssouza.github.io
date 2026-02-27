@@ -42,11 +42,11 @@ productivity-simple/
 
 - **Purpose**: Semantic HTML structure
 - **Contains**:
-  - Navigation sidebar
-  - Main content pages (7 pages)
-  - Modal dialogs (6 modals)
-  - Firebase script references
-  - No CSS or logic embedded
+    - Navigation sidebar
+    - Main content pages (7 pages)
+    - Modal dialogs (6 modals)
+    - Firebase script references
+    - No CSS or logic embedded
 
 ### css/styles.css (700+ lines)
 
@@ -54,10 +54,10 @@ productivity-simple/
 - **Components**: Buttons, cards, forms, modals
 - **Layouts**: Sidebar, main content, grid systems
 - **Features**:
-  - Light/dark mode support
-  - Responsive breakpoints
-  - Habit cards, calendar grid, expense tables
-  - Custom form inputs
+    - Light/dark mode support
+    - Responsive breakpoints
+    - Habit cards, calendar grid, expense tables
+    - Custom form inputs
 
 ### css/animations.css (380+ lines)
 
@@ -65,11 +65,11 @@ productivity-simple/
 - **Stagger Effects**: Cascading animations for lists
 - **Transitions**: Smooth state changes
 - **Features**:
-  - Page transitions
-  - Button interactions
-  - Card animations
-  - Modal entrance/exit
-  - Pomodoro ring animation
+    - Page transitions
+    - Button interactions
+    - Card animations
+    - Modal entrance/exit
+    - Pomodoro ring animation
 
 ### js/utils.js (150+ lines)
 
@@ -91,13 +91,13 @@ productivity-simple/
 - **State Management**: Central app state object
 - **Navigation**: Page routing system
 - **Features Implemented**:
-  - Habits (with streaks & heatmaps)
-  - Todos (with priorities & due dates)
-  - Calendar (monthly view with events)
-  - Pomodoro (with customizable sessions)
-  - Expenses (with charts & filters)
-  - Notes (with auto-save)
-  - Grocery (with categories & progress)
+    - Habits (with streaks & heatmaps)
+    - Todos (with priorities & due dates)
+    - Calendar (monthly view with events)
+    - Pomodoro (with customizable sessions)
+    - Expenses (with charts & filters)
+    - Notes (with auto-save)
+    - Grocery (with categories & progress)
 - **Event Handlers**: All click, input, and form handlers
 
 ## Code Organization in app.js
@@ -107,44 +107,44 @@ The app.js file is organized into logical sections with clear headers:
 ```javascript
 // APPLICATION STATE & CONSTANTS
 window._appState = {
-  /* state */
+    /* state */
 };
 const COLORS = [
-  /* */
+    /* */
 ];
 const CAT_COLORS = {
-  /* */
+    /* */
 };
 
 // MODULE 1: DARK MODE
 const darkMode = {
-  /* */
+    /* */
 };
 
 // MODULE 2: HABITS
 const renderHabits = () => {
-  /* */
+    /* */
 };
 const createHabit = () => {
-  /* */
+    /* */
 };
 const toggleHabit = () => {
-  /* */
+    /* */
 };
 // ...etc
 
 // MODULE 3: TODOS
 const renderTodos = () => {
-  /* */
+    /* */
 };
 const createTodo = () => {
-  /* */
+    /* */
 };
 // ...etc
 
 // MODULE 4: CALENDAR
 const renderCalendar = () => {
-  /* */
+    /* */
 };
 // ...etc
 

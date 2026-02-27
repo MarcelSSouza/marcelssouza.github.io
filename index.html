@@ -1,1133 +1,1108 @@
 <!doctype html>
 <html lang="en" data-theme="light">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-    <title>Focus - Productivity App</title>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+        <title>Focus - Productivity App</title>
 
-    <!-- PWA -->
-    <link rel="manifest" href="manifest.json" />
-    <meta name="theme-color" content="#5b6ef5" />
-    <meta name="mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="Focus" />
-    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+        <!-- PWA -->
+        <link rel="manifest" href="manifest.json" />
+        <meta name="theme-color" content="#5b6ef5" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="Focus" />
+        <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
 
-    <!-- Icons -->
-    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
-    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
+        <!-- Icons -->
+        <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+        <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
 
-    <!-- Stylesheets -->
-    <link rel="stylesheet" href="css/styles.css" />
-    <link rel="stylesheet" href="css/animations.css" />
-  </head>
-  <body>
-    <div id="app">
-      <!-- Hamburger Menu Button (Mobile) -->
-      <button
-        class="hamburger"
-        id="hamburger"
-        onclick="window._nav?.toggle?.()"
-      >
-        <span></span>
-        <span></span>
-        <span></span>
-      </button>
-
-      <!-- Navigation Sidebar -->
-      <nav id="nav">
-        <div class="brand">
-          <div class="brand-ico">⚡</div>
-          <h1>Focus</h1>
-        </div>
-        <button class="nb active" data-page="habits">
-          <span class="ic">🔥</span><span>Habits</span>
-        </button>
-        <button class="nb" data-page="todos">
-          <span class="ic">✅</span><span>Todos</span>
-        </button>
-        <button class="nb" data-page="calendar">
-          <span class="ic">📅</span><span>Calendar</span>
-        </button>
-        <button class="nb" data-page="pomodoro">
-          <span class="ic">🍅</span><span>Pomodoro</span>
-        </button>
-        <button class="nb" data-page="expenses">
-          <span class="ic">💰</span><span>Expenses</span>
-        </button>
-        <button class="nb" data-page="notes">
-          <span class="ic">📝</span><span>Notes</span>
-        </button>
-        <button class="nb" data-page="grocery">
-          <span class="ic">🛒</span><span>Grocery</span>
-        </button>
-        <button class="nb" data-page="settings">
-          <span class="ic">⚙️</span><span>Settings</span>
-        </button>
-        <button class="nb" data-page="games">
-          <span class="ic">🎮</span><span>Games</span>
-        </button>
-        <button class="nb" data-page="qa">
-          <span class="ic">❓</span><span>QA</span>
-        </button>
-        <div class="spacer"></div>
-        <div class="nav-footer">
-          <button class="dark-btn" onclick="window._darkMode?.toggle?.()">
-            <span class="ic" id="dark-ic">🌙</span><span>Dark mode</span>
-          </button>
-          <button
-            class="auth-btn"
-            id="auth-btn"
-            onclick="window._auth?.action?.()"
-          >
-            <span class="ic" id="auth-ic">👤</span>
-            <span class="auth-name" id="auth-label">Sign in</span>
-          </button>
-        </div>
-      </nav>
-
-      <!-- Auth Loading Overlay -->
-      <div id="auth-loading">
-        <div class="spinner"></div>
-        <span id="auth-loading-msg">Signing in…</span>
-      </div>
-
-      <!-- Main Content Area -->
-      <main>
-        <!-- HABITS PAGE -->
-        <div id="page-habits" class="page active">
-          <div class="ph"><h2>Habits</h2></div>
-          <div id="hgrid"></div>
-        </div>
-
-        <!-- TODOS PAGE -->
-        <div id="page-todos" class="page">
-          <div class="ph"><h2>Todos</h2></div>
-          <div class="todo-toolbar">
-            <input class="search-input" id="todo-search" placeholder="Search tasks…" oninput="window._todos?.search?.()" />
-            <div class="todo-toolbar-row">
-              <select id="todo-filter" onchange="window._todos?.applyFilter?.()">
-                <option value="all">All tasks</option>
-                <option value="active">Active</option>
-                <option value="done">Done</option>
-                <option value="high">High priority</option>
-                <option value="overdue">Overdue</option>
-              </select>
-              <select id="todo-sort" onchange="window._todos?.applySort?.()">
-                <option value="priority">Sort: Priority</option>
-                <option value="due-asc">Sort: Due ↑</option>
-                <option value="due-desc">Sort: Due ↓</option>
-                <option value="newest">Sort: Newest</option>
-              </select>
-            </div>
-          </div>
-          <div id="tlist"></div>
-        </div>
-
-        <!-- CALENDAR PAGE -->
-        <div id="page-calendar" class="page">
-          <div class="ph"><h2>Calendar</h2></div>
-          <div class="cal-nav">
-            <button
-              class="btn btn-g"
-              style="padding: 6px 12px"
-              onclick="window._calendar?.move?.(-1)"
-            >
-              ‹
+        <!-- Stylesheets -->
+        <link rel="stylesheet" href="css/styles.css" />
+        <link rel="stylesheet" href="css/animations.css" />
+    </head>
+    <body>
+        <div id="app">
+            <!-- Hamburger Menu Button (Mobile) -->
+            <button class="hamburger" id="hamburger" onclick="window._nav?.toggle?.()">
+                <span></span>
+                <span></span>
+                <span></span>
             </button>
-            <span id="cal-title"></span>
-            <button
-              class="btn btn-g"
-              style="padding: 6px 12px"
-              onclick="window._calendar?.move?.(1)"
-            >
-              ›
-            </button>
-            <button
-              class="btn btn-g"
-              style="margin-left: auto; font-size: 12.5px; padding: 6px 13px"
-              onclick="window._calendar?.goToday?.()"
-            >
-              Today
-            </button>
-          </div>
-          <div id="cgrid" class="cg"></div>
-          <div id="cdetail" class="card detail"></div>
+
+            <!-- Navigation Sidebar -->
+            <nav id="nav">
+                <div class="brand">
+                    <div class="brand-ico">⚡</div>
+                    <h1>Focus</h1>
+                </div>
+                <button class="nb active" data-page="habits"><span class="ic">🔥</span><span>Habits</span></button>
+                <button class="nb" data-page="todos"><span class="ic">✅</span><span>Todos</span></button>
+                <button class="nb" data-page="calendar"><span class="ic">📅</span><span>Calendar</span></button>
+                <button class="nb" data-page="pomodoro"><span class="ic">🍅</span><span>Pomodoro</span></button>
+                <button class="nb" data-page="expenses"><span class="ic">💰</span><span>Expenses</span></button>
+                <button class="nb" data-page="notes"><span class="ic">📝</span><span>Notes</span></button>
+                <button class="nb" data-page="grocery"><span class="ic">🛒</span><span>Grocery</span></button>
+                <button class="nb" data-page="settings"><span class="ic">⚙️</span><span>Settings</span></button>
+                <button class="nb" data-page="games"><span class="ic">🎮</span><span>Games</span></button>
+                <button class="nb" data-page="qa"><span class="ic">❓</span><span>QA</span></button>
+                <div class="spacer"></div>
+                <div class="nav-footer">
+                    <button class="dark-btn" onclick="window._darkMode?.toggle?.()">
+                        <span class="ic" id="dark-ic">🌙</span><span>Dark mode</span>
+                    </button>
+                    <button class="auth-btn" id="auth-btn" onclick="window._auth?.action?.()">
+                        <span class="ic" id="auth-ic">👤</span>
+                        <span class="auth-name" id="auth-label">Sign in</span>
+                    </button>
+                </div>
+            </nav>
+
+            <!-- Auth Loading Overlay -->
+            <div id="auth-loading">
+                <div class="spinner"></div>
+                <span id="auth-loading-msg">Signing in…</span>
+            </div>
+
+            <!-- Main Content Area -->
+            <main>
+                <!-- HABITS PAGE -->
+                <div id="page-habits" class="page active">
+                    <div class="ph"><h2>Habits</h2></div>
+                    <div id="hgrid"></div>
+                </div>
+
+                <!-- TODOS PAGE -->
+                <div id="page-todos" class="page">
+                    <div class="ph"><h2>Todos</h2></div>
+                    <div class="todo-toolbar">
+                        <input
+                            class="search-input"
+                            id="todo-search"
+                            placeholder="Search tasks…"
+                            oninput="window._todos?.search?.()"
+                        />
+                        <div class="todo-toolbar-row">
+                            <select id="todo-filter" onchange="window._todos?.applyFilter?.()">
+                                <option value="all">All tasks</option>
+                                <option value="active">Active</option>
+                                <option value="done">Done</option>
+                                <option value="high">High priority</option>
+                                <option value="overdue">Overdue</option>
+                            </select>
+                            <select id="todo-sort" onchange="window._todos?.applySort?.()">
+                                <option value="priority">Sort: Priority</option>
+                                <option value="due-asc">Sort: Due ↑</option>
+                                <option value="due-desc">Sort: Due ↓</option>
+                                <option value="newest">Sort: Newest</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="tlist"></div>
+                </div>
+
+                <!-- CALENDAR PAGE -->
+                <div id="page-calendar" class="page">
+                    <div class="ph"><h2>Calendar</h2></div>
+                    <div class="cal-nav">
+                        <button class="btn btn-g" style="padding: 6px 12px" onclick="window._calendar?.move?.(-1)">
+                            ‹
+                        </button>
+                        <span id="cal-title"></span>
+                        <button class="btn btn-g" style="padding: 6px 12px" onclick="window._calendar?.move?.(1)">
+                            ›
+                        </button>
+                        <button
+                            class="btn btn-g"
+                            style="margin-left: auto; font-size: 12.5px; padding: 6px 13px"
+                            onclick="window._calendar?.goToday?.()"
+                        >
+                            Today
+                        </button>
+                    </div>
+                    <div id="cgrid" class="cg"></div>
+                    <div id="cdetail" class="card detail"></div>
+                </div>
+
+                <!-- POMODORO PAGE -->
+                <div id="page-pomodoro" class="page">
+                    <div class="ph"><h2>Pomodoro</h2></div>
+                    <div class="pom-wrap">
+                        <div class="ptabs">
+                            <button class="ptab active" onclick="window._pomodoro?.setMode?.('work')">Focus</button>
+                            <button class="ptab" onclick="window._pomodoro?.setMode?.('short')">Short break</button>
+                            <button class="ptab" onclick="window._pomodoro?.setMode?.('long')">Long break</button>
+                        </div>
+                        <div class="ring-wrap">
+                            <svg class="psvg" viewBox="0 0 210 210">
+                                <circle class="ptrack" cx="105" cy="105" r="90" />
+                                <circle class="parc" id="parc" cx="105" cy="105" r="90" />
+                            </svg>
+                            <div class="pcenter">
+                                <div class="ptime" id="ptime">25:00</div>
+                                <div class="plabel" id="plbl">Focus time</div>
+                            </div>
+                        </div>
+                        <div class="pdots" id="pdots"></div>
+                        <div class="card psettings" style="margin-bottom: 12px; margin-top: 12px">
+                            <div
+                                style="
+                                    font-size: 12px;
+                                    font-weight: 700;
+                                    color: var(--t3);
+                                    letter-spacing: 0.5px;
+                                    margin-bottom: 8px;
+                                "
+                            >
+                                LINKED TASK
+                            </div>
+                            <select
+                                id="pom-todo"
+                                onchange="window._pomodoro?.selectTodo?.()"
+                                style="
+                                    width: 100%;
+                                    background: var(--bg);
+                                    color: var(--text);
+                                    border: 1px solid var(--border);
+                                    border-radius: var(--r);
+                                    padding: 8px 10px;
+                                    font-size: 13px;
+                                "
+                            >
+                                <option value="">— No task —</option>
+                            </select>
+                        </div>
+                        <div class="pcontrols">
+                            <button class="pside" onclick="window._pomodoro?.reset?.()">↺</button>
+                            <button class="pbig" id="pbtn" onclick="window._pomodoro?.toggle?.()">▶</button>
+                            <button class="pside" onclick="window._pomodoro?.skip?.()">⏭</button>
+                        </div>
+                        <div class="card psettings" style="margin-bottom: 12px">
+                            <div
+                                style="
+                                    font-size: 12px;
+                                    font-weight: 700;
+                                    color: var(--t3);
+                                    letter-spacing: 0.5px;
+                                    margin-bottom: 8px;
+                                "
+                            >
+                                BACKGROUND NOISE
+                            </div>
+                            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap">
+                                <button
+                                    class="noise-btn"
+                                    id="noise-off"
+                                    onclick="window._pomodoro?.setNoise?.('off')"
+                                    style="background: var(--primary); color: #fff"
+                                >
+                                    Off
+                                </button>
+                                <button
+                                    class="noise-btn"
+                                    id="noise-white"
+                                    onclick="window._pomodoro?.setNoise?.('white')"
+                                >
+                                    White
+                                </button>
+                                <button
+                                    class="noise-btn"
+                                    id="noise-brown"
+                                    onclick="window._pomodoro?.setNoise?.('brown')"
+                                >
+                                    Brown
+                                </button>
+                                <button
+                                    class="noise-btn"
+                                    id="noise-pink"
+                                    onclick="window._pomodoro?.setNoise?.('pink')"
+                                >
+                                    Pink
+                                </button>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px; margin-top: 10px">
+                                <span style="font-size: 12px; color: var(--t3)">Vol</span>
+                                <input
+                                    type="range"
+                                    id="noise-vol"
+                                    min="0"
+                                    max="100"
+                                    value="30"
+                                    style="flex: 1; accent-color: var(--primary)"
+                                    oninput="window._pomodoro?.setNoiseVol?.()"
+                                />
+                                <span id="noise-vol-lbl" style="font-size: 12px; color: var(--t3); width: 28px"
+                                    >30%</span
+                                >
+                            </div>
+                        </div>
+                        <div class="card psettings">
+                            <div
+                                style="
+                                    font-size: 12px;
+                                    font-weight: 700;
+                                    color: var(--t3);
+                                    letter-spacing: 0.5px;
+                                    margin-bottom: 4px;
+                                "
+                            >
+                                SETTINGS
+                            </div>
+                            <div class="pset">
+                                <span>Focus (min)</span
+                                ><input
+                                    type="number"
+                                    id="sw"
+                                    min="1"
+                                    max="60"
+                                    value="25"
+                                    onchange="window._pomodoro?.applySettings?.()"
+                                />
+                            </div>
+                            <div class="pset">
+                                <span>Short break</span
+                                ><input
+                                    type="number"
+                                    id="ss"
+                                    min="1"
+                                    max="30"
+                                    value="5"
+                                    onchange="window._pomodoro?.applySettings?.()"
+                                />
+                            </div>
+                            <div class="pset">
+                                <span>Long break</span
+                                ><input
+                                    type="number"
+                                    id="sl"
+                                    min="1"
+                                    max="60"
+                                    value="15"
+                                    onchange="window._pomodoro?.applySettings?.()"
+                                />
+                            </div>
+                            <div class="pset">
+                                <span>Sessions per cycle</span
+                                ><input
+                                    type="number"
+                                    id="sn"
+                                    min="1"
+                                    max="8"
+                                    value="4"
+                                    onchange="window._pomodoro?.applySettings?.()"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- EXPENSES PAGE -->
+                <div id="page-expenses" class="page">
+                    <div class="ph"><h2>Expenses</h2></div>
+                    <div class="exp-top">
+                        <div class="card exp-stat">
+                            <div class="lbl">Total spent</div>
+                            <div class="val red" id="exp-total">$0.00</div>
+                        </div>
+                        <div class="card exp-stat">
+                            <div class="lbl">This month</div>
+                            <div class="val" id="exp-month">$0.00</div>
+                        </div>
+                        <div class="card exp-stat">
+                            <div class="lbl">Entries</div>
+                            <div class="val" id="exp-count">0</div>
+                        </div>
+                    </div>
+                    <div class="card exp-budget" id="exp-budget-bar" style="margin-bottom: 18px; padding: 14px 18px">
+                        <div
+                            style="
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: center;
+                                margin-bottom: 8px;
+                            "
+                        >
+                            <span style="font-size: 13px; font-weight: 600; color: var(--t2)">Monthly budget</span>
+                            <div style="display: flex; align-items: center; gap: 6px">
+                                <span style="font-size: 12px; color: var(--t3)">$</span>
+                                <input
+                                    type="number"
+                                    id="exp-budget-input"
+                                    min="0"
+                                    step="10"
+                                    placeholder="Set limit…"
+                                    style="
+                                        width: 90px;
+                                        font-size: 13px;
+                                        font-weight: 700;
+                                        color: var(--primary);
+                                        background: transparent;
+                                        border: none;
+                                        border-bottom: 1px solid var(--border);
+                                        padding: 2px 4px;
+                                        text-align: right;
+                                    "
+                                    oninput="window._expenses?.setBudget?.()"
+                                />
+                            </div>
+                        </div>
+                        <div style="height: 6px; border-radius: 999px; background: var(--border); overflow: hidden">
+                            <div
+                                id="exp-budget-fill"
+                                style="
+                                    height: 100%;
+                                    border-radius: 999px;
+                                    background: linear-gradient(90deg, var(--green), var(--primary));
+                                    transition:
+                                        width 0.4s,
+                                        background 0.3s;
+                                    width: 0%;
+                                "
+                            ></div>
+                        </div>
+                        <div id="exp-budget-msg" style="font-size: 11.5px; color: var(--t3); margin-top: 5px"></div>
+                    </div>
+                    <div class="exp-body">
+                        <div class="card chart-box">
+                            <h4>
+                                By Category
+                                <span style="font-size: 10px; color: var(--t3); font-weight: 400">tap to filter</span>
+                            </h4>
+                            <canvas id="pie-canvas" width="220" height="220" style="cursor: pointer"></canvas>
+                        </div>
+                        <div class="card chart-box">
+                            <h4>Last 7 days</h4>
+                            <canvas id="bar-canvas" width="300" height="220"></canvas>
+                        </div>
+                    </div>
+                    <div class="filter-row" id="exp-filters"></div>
+                    <div id="exp-list" class="card exp-list"></div>
+                </div>
+
+                <!-- NOTES PAGE -->
+                <div id="page-notes" class="page">
+                    <div class="ph"><h2>Notes</h2></div>
+                    <input
+                        class="search-input"
+                        id="note-search"
+                        placeholder="Search notes…"
+                        oninput="window._notes?.search?.()"
+                        style="margin-bottom: 14px"
+                    />
+                    <div class="notes-layout">
+                        <div class="notes-list" id="notes-list"></div>
+                        <div class="note-editor card" id="note-editor" style="display: none">
+                            <div class="note-editor-top">
+                                <button
+                                    class="ico-btn note-back-btn"
+                                    onclick="window._notes?.backToList?.()"
+                                    title="Back to notes list"
+                                >
+                                    ←
+                                </button>
+                                <input
+                                    class="note-title-input"
+                                    id="ntitle"
+                                    placeholder="Untitled"
+                                    oninput="window._notes?.save?.()"
+                                />
+                                <button class="ico-btn" id="npin" onclick="window._notes?.pin?.()" title="Pin note">
+                                    📍
+                                </button>
+                                <button class="ico-btn" onclick="window._notes?.delete?.()">🗑</button>
+                            </div>
+                            <textarea
+                                class="note-body"
+                                id="nbody"
+                                placeholder="Start writing…"
+                                oninput="window._notes?.save?.()"
+                            ></textarea>
+                            <div class="note-footer">
+                                <span id="ndate"></span>
+                                <span id="nwords">0 words</span>
+                            </div>
+                        </div>
+                        <div class="no-note card" id="no-note">
+                            <div class="no-note-ic">📝</div>
+                            <span>Select a note or hit + to create one</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- GROCERY PAGE -->
+                <div id="page-grocery" class="page">
+                    <div class="ph">
+                        <h2>Grocery List</h2>
+                        <div style="display: flex; gap: 8px; align-items: center">
+                            <button
+                                class="btn btn-g"
+                                style="font-size: 12.5px; padding: 6px 13px"
+                                onclick="window._grocery?.clearDone?.()"
+                            >
+                                Clear checked
+                            </button>
+                            <button
+                                class="btn btn-g"
+                                style="font-size: 12.5px; padding: 6px 13px"
+                                onclick="window._grocery?.resetAll?.()"
+                            >
+                                Uncheck all
+                            </button>
+                            <button
+                                class="btn btn-g"
+                                style="font-size: 12.5px; padding: 6px 13px"
+                                onclick="window._grocery?.share?.()"
+                            >
+                                🔗 Share
+                            </button>
+                        </div>
+                    </div>
+                    <div class="gr-progress card" id="gr-progress-bar" style="margin-bottom: 18px; padding: 14px 18px">
+                        <div
+                            style="
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: center;
+                                margin-bottom: 8px;
+                            "
+                        >
+                            <span style="font-size: 13px; font-weight: 600; color: var(--t2)">Shopping progress</span>
+                            <span id="gr-fraction" style="font-size: 13px; font-weight: 700; color: var(--primary)"
+                                >0 / 0</span
+                            >
+                        </div>
+                        <div style="height: 6px; border-radius: 999px; background: var(--border); overflow: hidden">
+                            <div
+                                id="gr-bar"
+                                style="
+                                    height: 100%;
+                                    border-radius: 999px;
+                                    background: linear-gradient(90deg, var(--primary), var(--purple));
+                                    transition: width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+                                    width: 0%;
+                                "
+                            ></div>
+                        </div>
+                    </div>
+                    <div id="gr-cats"></div>
+                </div>
+
+                <!-- SETTINGS PAGE -->
+                <div id="page-settings" class="page">
+                    <div class="ph"><h2>Settings</h2></div>
+                    <div class="settings-content">
+                        <div class="card">
+                            <h4>Appearance</h4>
+                            <div class="settings-row">
+                                <span>Dark mode</span>
+                                <button class="dark-btn-settings" onclick="window._darkMode?.toggle?.()">
+                                    <span id="dm-toggle">🌙 Off</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <h4>Account</h4>
+                            <div class="settings-row">
+                                <span>Current user</span>
+                                <span id="settings-user" style="font-weight: 600; color: var(--primary)"
+                                    >Not signed in</span
+                                >
+                            </div>
+                            <button
+                                class="btn btn-p"
+                                style="width: 100%; margin-top: 12px"
+                                onclick="window._auth?.action?.()"
+                            >
+                                <span id="settings-auth-btn">Sign in with Google</span>
+                            </button>
+                        </div>
+
+                        <div class="card">
+                            <h4>Data</h4>
+                            <button
+                                class="btn btn-g"
+                                style="width: 100%; margin-bottom: 8px"
+                                onclick="window._settings?.exportData?.()"
+                            >
+                                📥 Export Data (JSON)
+                            </button>
+                            <button class="btn btn-g" style="width: 100%" onclick="window._settings?.importData?.()">
+                                📤 Import Data (JSON)
+                            </button>
+                            <input type="file" id="import-file" accept=".json" style="display: none" />
+                        </div>
+
+                        <div class="card">
+                            <h4>Support</h4>
+                            <button
+                                class="btn btn-g"
+                                style="width: 100%"
+                                onclick="window._utils?.openModal?.('contact')"
+                            >
+                                🐛 Report a bug
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- QA PAGE -->
+                <div id="page-qa" class="page">
+                    <div class="ph"><h2>FAQ & Help</h2></div>
+                    <div class="qa-content">
+                        <details class="qa-item">
+                            <summary>How do I create a new habit?</summary>
+                            <p>
+                                Click the <strong>+</strong> button at the bottom right, then fill in the habit name and
+                                choose a color. Your habit will appear in the Habits section where you can mark daily
+                                streaks.
+                            </p>
+                        </details>
+
+                        <details class="qa-item">
+                            <summary>Is my data safe in the cloud?</summary>
+                            <p>
+                                Yes! Your data is encrypted and stored securely in Google Firebase. It's only accessible
+                                when you're signed in with your Google account. You can also export your data anytime in
+                                Settings.
+                            </p>
+                        </details>
+
+                        <details class="qa-item">
+                            <summary>Why don't I see my data on another device?</summary>
+                            <p>
+                                Make sure you're signed in with the same Google account on both devices. Data syncs
+                                automatically when you're online. If it doesn't appear, try signing out and back in.
+                            </p>
+                        </details>
+
+                        <details class="qa-item">
+                            <summary>Can I delete my account and data?</summary>
+                            <p>
+                                Currently, you can sign out, which doesn't delete your cloud data. To permanently delete
+                                all data, please contact us using the bug report form with "Delete my account" in the
+                                message.
+                            </p>
+                        </details>
+
+                        <details class="qa-item">
+                            <summary>What is the Pomodoro timer?</summary>
+                            <p>
+                                The Pomodoro technique breaks work into 25-minute focus sessions with short breaks in
+                                between. You can customize the duration in the Pomodoro section under "Settings".
+                            </p>
+                        </details>
+
+                        <details class="qa-item">
+                            <summary>How do I sync expenses across devices?</summary>
+                            <p>
+                                Expenses are synced automatically when you're signed in. Make sure you're using the same
+                                Google account on all your devices.
+                            </p>
+                        </details>
+
+                        <details class="qa-item">
+                            <summary>Can I export my data?</summary>
+                            <p>
+                                Yes! Go to Settings and click "Export Data (JSON)". This downloads all your data as a
+                                JSON file. You can also import it back anytime.
+                            </p>
+                        </details>
+
+                        <details class="qa-item">
+                            <summary>Is there an offline mode?</summary>
+                            <p>
+                                Yes! All features work offline using your device's local storage. Changes sync to the
+                                cloud when you go back online.
+                            </p>
+                        </details>
+
+                        <details class="qa-item">
+                            <summary>How do I contact support?</summary>
+                            <p>
+                                You can report bugs or ask questions using the bug report form (accessible in Settings).
+                                We'll get back to you as soon as possible.
+                            </p>
+                        </details>
+                    </div>
+                </div>
+
+                <!-- GAMES PAGE -->
+                <div id="page-games" class="page">
+                    <div class="ph"><h2>Game Backlog</h2></div>
+
+                    <!-- Stats bar -->
+                    <div class="games-stats" id="games-stats"></div>
+
+                    <!-- Status tabs -->
+                    <div class="games-tabs" id="games-tabs">
+                        <button class="games-tab active" data-status="all">All</button>
+                        <button class="games-tab" data-status="wishlist">🕹 Want to Play</button>
+                        <button class="games-tab" data-status="playing">▶ Playing</button>
+                        <button class="games-tab" data-status="completed">✅ Completed</button>
+                        <button class="games-tab" data-status="dropped">💀 Dropped</button>
+                    </div>
+
+                    <!-- Search within backlog -->
+                    <input
+                        class="search-input"
+                        id="games-search"
+                        placeholder="Search your backlog…"
+                        oninput="window._games?.search?.()"
+                        style="margin-bottom: 14px"
+                    />
+
+                    <!-- Game list -->
+                    <div id="games-list"></div>
+                </div>
+            </main>
         </div>
 
-        <!-- POMODORO PAGE -->
-        <div id="page-pomodoro" class="page">
-          <div class="ph"><h2>Pomodoro</h2></div>
-          <div class="pom-wrap">
-            <div class="ptabs">
-              <button
-                class="ptab active"
-                onclick="window._pomodoro?.setMode?.('work')"
-              >
-                Focus
-              </button>
-              <button
-                class="ptab"
-                onclick="window._pomodoro?.setMode?.('short')"
-              >
-                Short break
-              </button>
-              <button
-                class="ptab"
-                onclick="window._pomodoro?.setMode?.('long')"
-              >
-                Long break
-              </button>
+        <!-- Floating Action Button -->
+        <button class="fab" id="fab" onclick="window._fab?.click?.()">+</button>
+
+        <!-- MODALS -->
+        <div id="mh" class="mbk">
+            <div class="modal">
+                <h3>New Habit</h3>
+                <div class="f"><label>Name</label><input type="text" id="hname" placeholder="e.g. Read 20 min" /></div>
+                <div class="f">
+                    <label>Colour</label>
+                    <div class="swatches" id="hswatches"></div>
+                </div>
+                <div class="f">
+                    <label>Weekly goal <span style="color: var(--t3); font-weight: 400">(days, 0 = off)</span></label>
+                    <input type="number" id="hweekly" min="0" max="7" value="0" />
+                </div>
+                <div class="f">
+                    <label>Daily reminder</label>
+                    <div style="display: flex; align-items: center; gap: 10px">
+                        <input type="time" id="hreminder-time" style="flex: 1" />
+                        <label
+                            style="display: flex; align-items: center; gap: 5px; font-size: 13px; white-space: nowrap"
+                        >
+                            <input type="checkbox" id="hreminder-enabled" /> On
+                        </label>
+                    </div>
+                </div>
+                <div class="ma">
+                    <button class="btn btn-g" onclick="window._utils?.closeModal?.()">Cancel</button>
+                    <button class="btn btn-p" onclick="window._habits?.create?.()">Create</button>
+                </div>
             </div>
-            <div class="ring-wrap">
-              <svg class="psvg" viewBox="0 0 210 210">
-                <circle class="ptrack" cx="105" cy="105" r="90" />
-                <circle class="parc" id="parc" cx="105" cy="105" r="90" />
-              </svg>
-              <div class="pcenter">
-                <div class="ptime" id="ptime">25:00</div>
-                <div class="plabel" id="plbl">Focus time</div>
-              </div>
-            </div>
-            <div class="pdots" id="pdots"></div>
-            <div class="card psettings" style="margin-bottom:12px;margin-top:12px">
-              <div style="font-size:12px;font-weight:700;color:var(--t3);letter-spacing:0.5px;margin-bottom:8px">LINKED TASK</div>
-              <select id="pom-todo" onchange="window._pomodoro?.selectTodo?.()" style="width:100%;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:var(--r);padding:8px 10px;font-size:13px">
-                <option value="">— No task —</option>
-              </select>
-            </div>
-            <div class="pcontrols">
-              <button class="pside" onclick="window._pomodoro?.reset?.()">
-                ↺
-              </button>
-              <button
-                class="pbig"
-                id="pbtn"
-                onclick="window._pomodoro?.toggle?.()"
-              >
-                ▶
-              </button>
-              <button class="pside" onclick="window._pomodoro?.skip?.()">
-                ⏭
-              </button>
-            </div>
-            <div class="card psettings" style="margin-bottom:12px">
-              <div style="font-size:12px;font-weight:700;color:var(--t3);letter-spacing:0.5px;margin-bottom:8px">BACKGROUND NOISE</div>
-              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-                <button class="noise-btn" id="noise-off" onclick="window._pomodoro?.setNoise?.('off')" style="background:var(--primary);color:#fff">Off</button>
-                <button class="noise-btn" id="noise-white" onclick="window._pomodoro?.setNoise?.('white')">White</button>
-                <button class="noise-btn" id="noise-brown" onclick="window._pomodoro?.setNoise?.('brown')">Brown</button>
-                <button class="noise-btn" id="noise-pink" onclick="window._pomodoro?.setNoise?.('pink')">Pink</button>
-              </div>
-              <div style="display:flex;align-items:center;gap:8px;margin-top:10px">
-                <span style="font-size:12px;color:var(--t3)">Vol</span>
-                <input type="range" id="noise-vol" min="0" max="100" value="30"
-                  style="flex:1;accent-color:var(--primary)"
-                  oninput="window._pomodoro?.setNoiseVol?.()" />
-                <span id="noise-vol-lbl" style="font-size:12px;color:var(--t3);width:28px">30%</span>
-              </div>
-            </div>
-            <div class="card psettings">
-              <div
-                style="
-                  font-size: 12px;
-                  font-weight: 700;
-                  color: var(--t3);
-                  letter-spacing: 0.5px;
-                  margin-bottom: 4px;
-                "
-              >
-                SETTINGS
-              </div>
-              <div class="pset">
-                <span>Focus (min)</span
-                ><input
-                  type="number"
-                  id="sw"
-                  min="1"
-                  max="60"
-                  value="25"
-                  onchange="window._pomodoro?.applySettings?.()"
-                />
-              </div>
-              <div class="pset">
-                <span>Short break</span
-                ><input
-                  type="number"
-                  id="ss"
-                  min="1"
-                  max="30"
-                  value="5"
-                  onchange="window._pomodoro?.applySettings?.()"
-                />
-              </div>
-              <div class="pset">
-                <span>Long break</span
-                ><input
-                  type="number"
-                  id="sl"
-                  min="1"
-                  max="60"
-                  value="15"
-                  onchange="window._pomodoro?.applySettings?.()"
-                />
-              </div>
-              <div class="pset">
-                <span>Sessions per cycle</span
-                ><input
-                  type="number"
-                  id="sn"
-                  min="1"
-                  max="8"
-                  value="4"
-                  onchange="window._pomodoro?.applySettings?.()"
-                />
-              </div>
-            </div>
-          </div>
         </div>
 
-        <!-- EXPENSES PAGE -->
-        <div id="page-expenses" class="page">
-          <div class="ph"><h2>Expenses</h2></div>
-          <div class="exp-top">
-            <div class="card exp-stat">
-              <div class="lbl">Total spent</div>
-              <div class="val red" id="exp-total">$0.00</div>
+        <div id="mt" class="mbk">
+            <div class="modal">
+                <h3>New Todo</h3>
+                <div class="f">
+                    <label>Title</label><input type="text" id="ttitle" placeholder="What needs to be done?" />
+                </div>
+                <div class="f">
+                    <label>Priority</label>
+                    <select id="tpri">
+                        <option value="none">None</option>
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                </div>
+                <div class="f"><label>Due Date</label><input type="date" id="tdue" /></div>
+                <div class="f">
+                    <label>Repeat</label>
+                    <select id="trepeat">
+                        <option value="none">No repeat</option>
+                        <option value="daily">Daily</option>
+                        <option value="weekly">Weekly</option>
+                    </select>
+                </div>
+                <div class="ma">
+                    <button class="btn btn-g" onclick="window._utils?.closeModal?.()">Cancel</button>
+                    <button class="btn btn-p" onclick="window._todos?.create?.()">Create</button>
+                </div>
             </div>
-            <div class="card exp-stat">
-              <div class="lbl">This month</div>
-              <div class="val" id="exp-month">$0.00</div>
-            </div>
-            <div class="card exp-stat">
-              <div class="lbl">Entries</div>
-              <div class="val" id="exp-count">0</div>
-            </div>
-          </div>
-          <div class="card exp-budget" id="exp-budget-bar" style="margin-bottom:18px;padding:14px 18px">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-              <span style="font-size:13px;font-weight:600;color:var(--t2)">Monthly budget</span>
-              <div style="display:flex;align-items:center;gap:6px">
-                <span style="font-size:12px;color:var(--t3)">$</span>
-                <input type="number" id="exp-budget-input" min="0" step="10" placeholder="Set limit…"
-                  style="width:90px;font-size:13px;font-weight:700;color:var(--primary);background:transparent;border:none;border-bottom:1px solid var(--border);padding:2px 4px;text-align:right"
-                  oninput="window._expenses?.setBudget?.()" />
-              </div>
-            </div>
-            <div style="height:6px;border-radius:999px;background:var(--border);overflow:hidden">
-              <div id="exp-budget-fill" style="height:100%;border-radius:999px;background:linear-gradient(90deg,var(--green),var(--primary));transition:width 0.4s,background 0.3s;width:0%"></div>
-            </div>
-            <div id="exp-budget-msg" style="font-size:11.5px;color:var(--t3);margin-top:5px"></div>
-          </div>
-          <div class="exp-body">
-            <div class="card chart-box">
-              <h4>By Category <span style="font-size:10px;color:var(--t3);font-weight:400">tap to filter</span></h4>
-              <canvas id="pie-canvas" width="220" height="220" style="cursor:pointer"></canvas>
-            </div>
-            <div class="card chart-box">
-              <h4>Last 7 days</h4>
-              <canvas id="bar-canvas" width="300" height="220"></canvas>
-            </div>
-          </div>
-          <div class="filter-row" id="exp-filters"></div>
-          <div id="exp-list" class="card exp-list"></div>
         </div>
 
-        <!-- NOTES PAGE -->
-        <div id="page-notes" class="page">
-          <div class="ph"><h2>Notes</h2></div>
-          <input class="search-input" id="note-search" placeholder="Search notes…" oninput="window._notes?.search?.()" style="margin-bottom:14px" />
-          <div class="notes-layout">
-            <div class="notes-list" id="notes-list"></div>
-            <div
-              class="note-editor card"
-              id="note-editor"
-              style="display: none"
-            >
-              <div class="note-editor-top">
-                <button class="ico-btn note-back-btn" onclick="window._notes?.backToList?.()" title="Back to notes list">←</button>
-                <input
-                  class="note-title-input"
-                  id="ntitle"
-                  placeholder="Untitled"
-                  oninput="window._notes?.save?.()"
-                />
-                <button class="ico-btn" id="npin" onclick="window._notes?.pin?.()" title="Pin note">📍</button>
-                <button class="ico-btn" onclick="window._notes?.delete?.()">
-                  🗑
-                </button>
-              </div>
-              <textarea
-                class="note-body"
-                id="nbody"
-                placeholder="Start writing…"
-                oninput="window._notes?.save?.()"
-              ></textarea>
-              <div class="note-footer">
-                <span id="ndate"></span>
-                <span id="nwords">0 words</span>
-              </div>
+        <div id="me" class="mbk">
+            <div class="modal">
+                <h3>New Event</h3>
+                <div class="f"><label>Title</label><input type="text" id="etitle" placeholder="Event name" /></div>
+                <div class="f"><label>Date</label><input type="date" id="edate" /></div>
+                <div class="f"><label>Time (optional)</label><input type="time" id="etime" /></div>
+                <div class="f">
+                    <label>Notes (optional)</label><textarea id="enotes" placeholder="Optional notes…"></textarea>
+                </div>
+                <div class="ma">
+                    <button class="btn btn-g" onclick="window._utils?.closeModal?.()">Cancel</button>
+                    <button class="btn btn-p" onclick="window._calendar?.createEvent?.()">Save Event</button>
+                </div>
             </div>
-            <div class="no-note card" id="no-note">
-              <div class="no-note-ic">📝</div>
-              <span>Select a note or hit + to create one</span>
-            </div>
-          </div>
         </div>
 
-        <!-- GROCERY PAGE -->
-        <div id="page-grocery" class="page">
-          <div class="ph">
-            <h2>Grocery List</h2>
-            <div style="display: flex; gap: 8px; align-items: center">
-              <button
-                class="btn btn-g"
-                style="font-size: 12.5px; padding: 6px 13px"
-                onclick="window._grocery?.clearDone?.()"
-              >
-                Clear checked
-              </button>
-              <button
-                class="btn btn-g"
-                style="font-size: 12.5px; padding: 6px 13px"
-                onclick="window._grocery?.resetAll?.()"
-              >
-                Uncheck all
-              </button>
-              <button
-                class="btn btn-g"
-                style="font-size: 12.5px; padding: 6px 13px"
-                onclick="window._grocery?.share?.()"
-              >
-                🔗 Share
-              </button>
+        <div id="mx" class="mbk">
+            <div class="modal">
+                <h3>Add Expense</h3>
+                <div class="f">
+                    <label>Description</label><input type="text" id="xdesc" placeholder="e.g. Coffee" />
+                </div>
+                <div class="f">
+                    <label>Amount ($)</label><input type="number" id="xamount" min="0" step="0.01" placeholder="0.00" />
+                </div>
+                <div class="f">
+                    <label>Category</label>
+                    <select id="xcat">
+                        <option value="🍔 Food">🍔 Food</option>
+                        <option value="🚗 Transport">🚗 Transport</option>
+                        <option value="🛍 Shopping">🛍 Shopping</option>
+                        <option value="🏠 Housing">🏠 Housing</option>
+                        <option value="💊 Health">💊 Health</option>
+                        <option value="🎮 Entertainment">🎮 Entertainment</option>
+                        <option value="📚 Education">📚 Education</option>
+                        <option value="💡 Utilities">💡 Utilities</option>
+                        <option value="✈️ Travel">✈️ Travel</option>
+                        <option value="🔧 Other">🔧 Other</option>
+                    </select>
+                </div>
+                <div class="f"><label>Date</label><input type="date" id="xdate" /></div>
+                <div class="ma">
+                    <button class="btn btn-g" onclick="window._utils?.closeModal?.()">Cancel</button>
+                    <button class="btn btn-p" onclick="window._expenses?.create?.()">Add</button>
+                </div>
             </div>
-          </div>
-          <div
-            class="gr-progress card"
-            id="gr-progress-bar"
-            style="margin-bottom: 18px; padding: 14px 18px"
-          >
-            <div
-              style="
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                margin-bottom: 8px;
-              "
-            >
-              <span style="font-size: 13px; font-weight: 600; color: var(--t2)"
-                >Shopping progress</span
-              >
-              <span
-                id="gr-fraction"
-                style="font-size: 13px; font-weight: 700; color: var(--primary)"
-                >0 / 0</span
-              >
-            </div>
-            <div
-              style="
-                height: 6px;
-                border-radius: 999px;
-                background: var(--border);
-                overflow: hidden;
-              "
-            >
-              <div
-                id="gr-bar"
-                style="
-                  height: 100%;
-                  border-radius: 999px;
-                  background: linear-gradient(
-                    90deg,
-                    var(--primary),
-                    var(--purple)
-                  );
-                  transition: width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-                  width: 0%;
-                "
-              ></div>
-            </div>
-          </div>
-          <div id="gr-cats"></div>
         </div>
 
-        <!-- SETTINGS PAGE -->
-        <div id="page-settings" class="page">
-          <div class="ph"><h2>Settings</h2></div>
-          <div class="settings-content">
-            <div class="card">
-              <h4>Appearance</h4>
-              <div class="settings-row">
-                <span>Dark mode</span>
-                <button
-                  class="dark-btn-settings"
-                  onclick="window._darkMode?.toggle?.()"
+        <div id="mg" class="mbk">
+            <div class="modal">
+                <h3>Add Item</h3>
+                <div class="f">
+                    <label>Item name</label><input type="text" id="gname" placeholder="e.g. Whole milk" />
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px">
+                    <div class="f">
+                        <label>Qty</label><input type="number" id="gqty" min="1" value="1" placeholder="1" />
+                    </div>
+                    <div class="f">
+                        <label>Unit</label>
+                        <select id="gunit">
+                            <option value="">—</option>
+                            <option value="pcs">pcs</option>
+                            <option value="kg">kg</option>
+                            <option value="g">g</option>
+                            <option value="L">L</option>
+                            <option value="ml">ml</option>
+                            <option value="pack">pack</option>
+                            <option value="box">box</option>
+                            <option value="bag">bag</option>
+                            <option value="can">can</option>
+                            <option value="bottle">bottle</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="f">
+                    <label>Category</label>
+                    <select id="gcat">
+                        <option value="🥦 Produce">🥦 Produce</option>
+                        <option value="🥩 Meat">🥩 Meat</option>
+                        <option value="🥛 Dairy">🥛 Dairy</option>
+                        <option value="🥖 Bakery">🥖 Bakery</option>
+                        <option value="🧊 Frozen">🧊 Frozen</option>
+                        <option value="🥫 Pantry">🥫 Pantry</option>
+                        <option value="🧴 Household">🧴 Household</option>
+                        <option value="🫙 Drinks">🫙 Drinks</option>
+                        <option value="🍬 Snacks">🍬 Snacks</option>
+                        <option value="💊 Health">💊 Health</option>
+                        <option value="🛒 Other">🛒 Other</option>
+                    </select>
+                </div>
+                <div class="f">
+                    <label>Note (optional)</label><input type="text" id="gnote" placeholder="e.g. brand, size…" />
+                </div>
+                <div class="ma">
+                    <button class="btn btn-g" onclick="window._utils?.closeModal?.()">Cancel</button>
+                    <button class="btn btn-p" onclick="window._grocery?.create?.()">Add to list</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- EDIT TODO MODAL -->
+        <div id="mt-edit" class="mbk">
+            <div class="modal">
+                <h3>Edit Task</h3>
+                <div class="f">
+                    <label>Title</label>
+                    <input type="text" id="ttitle-edit" placeholder="What needs to be done?" />
+                </div>
+                <div class="f">
+                    <label>Priority</label>
+                    <select id="tpri-edit">
+                        <option value="none">None</option>
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                </div>
+                <div class="f"><label>Due Date</label><input type="date" id="tdue-edit" /></div>
+                <div class="f">
+                    <label>Repeat</label>
+                    <select id="trepeat-edit">
+                        <option value="none">No repeat</option>
+                        <option value="daily">Daily</option>
+                        <option value="weekly">Weekly</option>
+                    </select>
+                </div>
+                <input type="hidden" id="tedit-id" />
+                <div class="ma">
+                    <button class="btn btn-g" onclick="window._utils?.closeModal?.()">Cancel</button>
+                    <button class="btn btn-p" onclick="window._todos?.saveEdit?.()">Save</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- EDIT HABIT MODAL -->
+        <div id="mh-edit" class="mbk">
+            <div class="modal">
+                <h3>Edit Habit</h3>
+                <div class="f">
+                    <label>Name</label>
+                    <input type="text" id="hname-edit" placeholder="e.g. Read 20 min" />
+                </div>
+                <div class="f">
+                    <label>Colour</label>
+                    <div class="swatches" id="hswatches-edit"></div>
+                </div>
+                <div class="f">
+                    <label>Weekly goal <span style="color: var(--t3); font-weight: 400">(days, 0 = off)</span></label>
+                    <input type="number" id="hweekly-edit" min="0" max="7" value="0" />
+                </div>
+                <div class="f">
+                    <label>Daily reminder</label>
+                    <div style="display: flex; align-items: center; gap: 10px">
+                        <input type="time" id="hreminder-time-edit" style="flex: 1" />
+                        <label
+                            style="display: flex; align-items: center; gap: 5px; font-size: 13px; white-space: nowrap"
+                        >
+                            <input type="checkbox" id="hreminder-enabled-edit" /> On
+                        </label>
+                    </div>
+                </div>
+                <input type="hidden" id="hedit-id" />
+                <div class="ma">
+                    <button class="btn btn-g" onclick="window._utils?.closeModal?.()">Cancel</button>
+                    <button class="btn btn-p" onclick="window._habits?.saveEdit?.()">Save</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- EDIT EVENT MODAL -->
+        <div id="me-edit" class="mbk">
+            <div class="modal">
+                <h3>Edit Event</h3>
+                <input type="hidden" id="eeedit-id" />
+                <div class="f"><label>Title</label><input type="text" id="eetitle" placeholder="Event name" /></div>
+                <div class="f"><label>Date</label><input type="date" id="eedate" /></div>
+                <div class="f"><label>Time (optional)</label><input type="time" id="eetime" /></div>
+                <div class="f">
+                    <label>Notes (optional)</label><textarea id="eenotes" placeholder="Optional notes…"></textarea>
+                </div>
+                <div class="ma">
+                    <button class="btn btn-g" onclick="window._utils?.closeModal?.()">Cancel</button>
+                    <button class="btn btn-p" onclick="window._calendar?.saveEdit?.()">Save</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- LOGOUT CONFIRMATION MODAL -->
+        <div id="m-logout" class="mbk">
+            <div class="modal modal-sm">
+                <div class="logout-avatar-wrap">
+                    <div id="logout-avatar" class="logout-avatar">👤</div>
+                </div>
+                <h3 style="text-align: center; margin-bottom: 4px">Sign out?</h3>
+                <p
+                    id="logout-user-info"
+                    style="text-align: center; font-size: 13px; color: var(--t3); margin-bottom: 20px"
                 >
-                  <span id="dm-toggle">🌙 Off</span>
-                </button>
-              </div>
+                    Your data stays safely in the cloud.
+                </p>
+                <div class="ma">
+                    <button class="btn btn-g" onclick="window._utils?.closeModal?.()">Cancel</button>
+                    <button class="btn btn-d" onclick="window._auth?.confirmLogout?.()">Sign out</button>
+                </div>
             </div>
+        </div>
 
-            <div class="card">
-              <h4>Account</h4>
-              <div class="settings-row">
-                <span>Current user</span>
-                <span
-                  id="settings-user"
-                  style="font-weight: 600; color: var(--primary)"
-                  >Not signed in</span
-                >
-              </div>
-              <button
-                class="btn btn-p"
-                style="width: 100%; margin-top: 12px"
-                onclick="window._auth?.action?.()"
-              >
-                <span id="settings-auth-btn">Sign in with Google</span>
-              </button>
+        <!-- ADD GAME MODAL -->
+        <div id="mg-add" class="mbk">
+            <div class="modal">
+                <h3>Add Game</h3>
+
+                <!-- RAWG search -->
+                <div class="f">
+                    <label>Search game</label>
+                    <div class="game-search-wrap">
+                        <input
+                            type="text"
+                            id="game-search-input"
+                            placeholder="e.g. Elden Ring…"
+                            autocomplete="off"
+                            oninput="window._games?.liveSearch?.()"
+                        />
+                        <div id="game-search-results" class="game-search-results"></div>
+                    </div>
+                </div>
+
+                <!-- Selected game preview -->
+                <div id="game-selected-preview" class="game-selected-preview" style="display: none"></div>
+
+                <!-- Hidden fields populated by API selection or manual entry -->
+                <input type="hidden" id="gnew-rawg-id" />
+                <input type="hidden" id="gnew-cover" />
+
+                <!-- Manual title fallback (shown only if not from API) -->
+                <div class="f" id="gnew-title-row">
+                    <label
+                        >Title
+                        <span style="color: var(--t3); font-weight: 400; font-size: 12px"
+                            >(or type manually)</span
+                        ></label
+                    >
+                    <input type="text" id="gnew-title" placeholder="Game title" />
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px">
+                    <div class="f">
+                        <label>Status</label>
+                        <select id="gnew-status">
+                            <option value="wishlist">🕹 Want to Play</option>
+                            <option value="playing">▶ Playing</option>
+                            <option value="completed">✅ Completed</option>
+                            <option value="dropped">💀 Dropped</option>
+                        </select>
+                    </div>
+                    <div class="f">
+                        <label>Rating <span style="color: var(--t3); font-weight: 400">/ 10</span></label>
+                        <input type="number" id="gnew-rating" min="1" max="10" placeholder="—" />
+                    </div>
+                </div>
+
+                <div class="f">
+                    <label>Platform</label>
+                    <input type="text" id="gnew-platform" placeholder="e.g. PC, PS5, Switch…" />
+                </div>
+                <div class="f">
+                    <label>Notes (optional)</label>
+                    <textarea id="gnew-notes" placeholder="Impressions, tips, story notes…" rows="2"></textarea>
+                </div>
+
+                <div class="ma">
+                    <button class="btn btn-g" onclick="window._utils?.closeModal?.()">Cancel</button>
+                    <button class="btn btn-p" onclick="window._games?.create?.()">Add to backlog</button>
+                </div>
             </div>
+        </div>
 
-            <div class="card">
-              <h4>Data</h4>
-              <button
-                class="btn btn-g"
-                style="width: 100%; margin-bottom: 8px"
-                onclick="window._settings?.exportData?.()"
-              >
-                📥 Export Data (JSON)
-              </button>
-              <button
-                class="btn btn-g"
-                style="width: 100%"
-                onclick="window._settings?.importData?.()"
-              >
-                📤 Import Data (JSON)
-              </button>
-              <input
-                type="file"
-                id="import-file"
-                accept=".json"
-                style="display: none"
-              />
+        <!-- EDIT GAME MODAL -->
+        <div id="mg-edit" class="mbk">
+            <div class="modal">
+                <h3>Edit Game</h3>
+                <input type="hidden" id="gedit-id" />
+
+                <div id="gedit-preview" class="game-selected-preview" style="margin-bottom: 14px"></div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px">
+                    <div class="f">
+                        <label>Status</label>
+                        <select id="gedit-status">
+                            <option value="wishlist">🕹 Want to Play</option>
+                            <option value="playing">▶ Playing</option>
+                            <option value="completed">✅ Completed</option>
+                            <option value="dropped">💀 Dropped</option>
+                        </select>
+                    </div>
+                    <div class="f">
+                        <label>Rating / 10</label>
+                        <input type="number" id="gedit-rating" min="1" max="10" placeholder="—" />
+                    </div>
+                </div>
+
+                <div class="f">
+                    <label>Platform</label>
+                    <input type="text" id="gedit-platform" placeholder="e.g. PC, PS5, Switch…" />
+                </div>
+                <div class="f">
+                    <label>Notes (optional)</label>
+                    <textarea id="gedit-notes" rows="3"></textarea>
+                </div>
+
+                <div class="ma">
+                    <button class="btn btn-g" onclick="window._utils?.closeModal?.()">Cancel</button>
+                    <button class="btn btn-p" onclick="window._games?.saveEdit?.()">Save</button>
+                </div>
             </div>
+        </div>
 
-            <div class="card">
-              <h4>Support</h4>
-              <button
-                class="btn btn-g"
-                style="width: 100%"
-                onclick="window._utils?.openModal?.('contact')"
-              >
-                🐛 Report a bug
-              </button>
+        <!-- CONTACT FORM MODAL -->
+        <div id="contact" class="mbk">
+            <div class="modal">
+                <h3>Report a Bug or Contact Us</h3>
+                <form id="contact-form" class="contact-form">
+                    <div class="f">
+                        <label>Your Email</label>
+                        <input type="email" name="email" id="contact-email" placeholder="your@email.com" required />
+                    </div>
+                    <div class="f">
+                        <label>Subject</label>
+                        <select name="subject" required>
+                            <option value="">Select a category...</option>
+                            <option value="Bug Report">🐛 Bug Report</option>
+                            <option value="Feature Request">💡 Feature Request</option>
+                            <option value="Data Issue">📊 Data/Sync Issue</option>
+                            <option value="Performance">⚡ Performance Issue</option>
+                            <option value="General Feedback">📝 General Feedback</option>
+                            <option value="Other">❓ Other</option>
+                        </select>
+                    </div>
+                    <div class="f">
+                        <label>Message</label>
+                        <textarea
+                            name="message"
+                            id="contact-message"
+                            placeholder="Please describe the issue or suggestion..."
+                            rows="6"
+                            style="resize: vertical"
+                            required
+                        ></textarea>
+                    </div>
+                    <div class="f">
+                        <label>App Version</label>
+                        <input type="text" name="version" id="contact-version" placeholder="e.g., v1.0" readonly />
+                    </div>
+                    <div class="ma">
+                        <button type="button" class="btn btn-g" onclick="window._utils?.closeModal?.()">Cancel</button>
+                        <button type="submit" class="btn btn-p" id="submit-contact">Send Report</button>
+                    </div>
+                </form>
             </div>
-          </div>
         </div>
 
-        <!-- QA PAGE -->
-        <div id="page-qa" class="page">
-          <div class="ph"><h2>FAQ & Help</h2></div>
-          <div class="qa-content">
-            <details class="qa-item">
-              <summary>How do I create a new habit?</summary>
-              <p>
-                Click the <strong>+</strong> button at the bottom right, then
-                fill in the habit name and choose a color. Your habit will
-                appear in the Habits section where you can mark daily streaks.
-              </p>
-            </details>
+        <!-- Firebase Libraries -->
+        <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
-            <details class="qa-item">
-              <summary>Is my data safe in the cloud?</summary>
-              <p>
-                Yes! Your data is encrypted and stored securely in Google
-                Firebase. It's only accessible when you're signed in with your
-                Google account. You can also export your data anytime in
-                Settings.
-              </p>
-            </details>
+        <!-- Application Scripts -->
+        <script src="js/app.js" type="module"></script>
 
-            <details class="qa-item">
-              <summary>Why don't I see my data on another device?</summary>
-              <p>
-                Make sure you're signed in with the same Google account on both
-                devices. Data syncs automatically when you're online. If it
-                doesn't appear, try signing out and back in.
-              </p>
-            </details>
-
-            <details class="qa-item">
-              <summary>Can I delete my account and data?</summary>
-              <p>
-                Currently, you can sign out, which doesn't delete your cloud
-                data. To permanently delete all data, please contact us using
-                the bug report form with "Delete my account" in the message.
-              </p>
-            </details>
-
-            <details class="qa-item">
-              <summary>What is the Pomodoro timer?</summary>
-              <p>
-                The Pomodoro technique breaks work into 25-minute focus sessions
-                with short breaks in between. You can customize the duration in
-                the Pomodoro section under "Settings".
-              </p>
-            </details>
-
-            <details class="qa-item">
-              <summary>How do I sync expenses across devices?</summary>
-              <p>
-                Expenses are synced automatically when you're signed in. Make
-                sure you're using the same Google account on all your devices.
-              </p>
-            </details>
-
-            <details class="qa-item">
-              <summary>Can I export my data?</summary>
-              <p>
-                Yes! Go to Settings and click "Export Data (JSON)". This
-                downloads all your data as a JSON file. You can also import it
-                back anytime.
-              </p>
-            </details>
-
-            <details class="qa-item">
-              <summary>Is there an offline mode?</summary>
-              <p>
-                Yes! All features work offline using your device's local
-                storage. Changes sync to the cloud when you go back online.
-              </p>
-            </details>
-
-            <details class="qa-item">
-              <summary>How do I contact support?</summary>
-              <p>
-                You can report bugs or ask questions using the bug report form
-                (accessible in Settings). We'll get back to you as soon as
-                possible.
-              </p>
-            </details>
-          </div>
-        </div>
-
-        <!-- GAMES PAGE -->
-        <div id="page-games" class="page">
-          <div class="ph"><h2>Game Backlog</h2></div>
-
-          <!-- Stats bar -->
-          <div class="games-stats" id="games-stats"></div>
-
-          <!-- Status tabs -->
-          <div class="games-tabs" id="games-tabs">
-            <button class="games-tab active" data-status="all">All</button>
-            <button class="games-tab" data-status="wishlist">🕹 Want to Play</button>
-            <button class="games-tab" data-status="playing">▶ Playing</button>
-            <button class="games-tab" data-status="completed">✅ Completed</button>
-            <button class="games-tab" data-status="dropped">💀 Dropped</button>
-          </div>
-
-          <!-- Search within backlog -->
-          <input class="search-input" id="games-search" placeholder="Search your backlog…" oninput="window._games?.search?.()" style="margin-bottom:14px" />
-
-          <!-- Game list -->
-          <div id="games-list"></div>
-        </div>
-      </main>
-    </div>
-
-    <!-- Floating Action Button -->
-    <button class="fab" id="fab" onclick="window._fab?.click?.()">+</button>
-
-    <!-- MODALS -->
-    <div id="mh" class="mbk">
-      <div class="modal">
-        <h3>New Habit</h3>
-        <div class="f">
-          <label>Name</label
-          ><input type="text" id="hname" placeholder="e.g. Read 20 min" />
-        </div>
-        <div class="f">
-          <label>Colour</label>
-          <div class="swatches" id="hswatches"></div>
-        </div>
-        <div class="f">
-          <label>Weekly goal <span style="color:var(--t3);font-weight:400">(days, 0 = off)</span></label>
-          <input type="number" id="hweekly" min="0" max="7" value="0" />
-        </div>
-        <div class="f">
-          <label>Daily reminder</label>
-          <div style="display:flex;align-items:center;gap:10px">
-            <input type="time" id="hreminder-time" style="flex:1" />
-            <label style="display:flex;align-items:center;gap:5px;font-size:13px;white-space:nowrap">
-              <input type="checkbox" id="hreminder-enabled" /> On
-            </label>
-          </div>
-        </div>
-        <div class="ma">
-          <button class="btn btn-g" onclick="window._utils?.closeModal?.()">
-            Cancel
-          </button>
-          <button class="btn btn-p" onclick="window._habits?.create?.()">
-            Create
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <div id="mt" class="mbk">
-      <div class="modal">
-        <h3>New Todo</h3>
-        <div class="f">
-          <label>Title</label
-          ><input
-            type="text"
-            id="ttitle"
-            placeholder="What needs to be done?"
-          />
-        </div>
-        <div class="f">
-          <label>Priority</label>
-          <select id="tpri">
-            <option value="none">None</option>
-            <option value="low">Low</option>
-            <option value="medium">Medium</option>
-            <option value="high">High</option>
-          </select>
-        </div>
-        <div class="f">
-          <label>Due Date</label><input type="date" id="tdue" />
-        </div>
-        <div class="f">
-          <label>Repeat</label>
-          <select id="trepeat">
-            <option value="none">No repeat</option>
-            <option value="daily">Daily</option>
-            <option value="weekly">Weekly</option>
-          </select>
-        </div>
-        <div class="ma">
-          <button class="btn btn-g" onclick="window._utils?.closeModal?.()">
-            Cancel
-          </button>
-          <button class="btn btn-p" onclick="window._todos?.create?.()">
-            Create
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <div id="me" class="mbk">
-      <div class="modal">
-        <h3>New Event</h3>
-        <div class="f">
-          <label>Title</label
-          ><input type="text" id="etitle" placeholder="Event name" />
-        </div>
-        <div class="f"><label>Date</label><input type="date" id="edate" /></div>
-        <div class="f">
-          <label>Time (optional)</label><input type="time" id="etime" />
-        </div>
-        <div class="f">
-          <label>Notes (optional)</label
-          ><textarea id="enotes" placeholder="Optional notes…"></textarea>
-        </div>
-        <div class="ma">
-          <button class="btn btn-g" onclick="window._utils?.closeModal?.()">
-            Cancel
-          </button>
-          <button class="btn btn-p" onclick="window._calendar?.createEvent?.()">
-            Save Event
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <div id="mx" class="mbk">
-      <div class="modal">
-        <h3>Add Expense</h3>
-        <div class="f">
-          <label>Description</label
-          ><input type="text" id="xdesc" placeholder="e.g. Coffee" />
-        </div>
-        <div class="f">
-          <label>Amount ($)</label
-          ><input
-            type="number"
-            id="xamount"
-            min="0"
-            step="0.01"
-            placeholder="0.00"
-          />
-        </div>
-        <div class="f">
-          <label>Category</label>
-          <select id="xcat">
-            <option value="🍔 Food">🍔 Food</option>
-            <option value="🚗 Transport">🚗 Transport</option>
-            <option value="🛍 Shopping">🛍 Shopping</option>
-            <option value="🏠 Housing">🏠 Housing</option>
-            <option value="💊 Health">💊 Health</option>
-            <option value="🎮 Entertainment">🎮 Entertainment</option>
-            <option value="📚 Education">📚 Education</option>
-            <option value="💡 Utilities">💡 Utilities</option>
-            <option value="✈️ Travel">✈️ Travel</option>
-            <option value="🔧 Other">🔧 Other</option>
-          </select>
-        </div>
-        <div class="f"><label>Date</label><input type="date" id="xdate" /></div>
-        <div class="ma">
-          <button class="btn btn-g" onclick="window._utils?.closeModal?.()">
-            Cancel
-          </button>
-          <button class="btn btn-p" onclick="window._expenses?.create?.()">
-            Add
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <div id="mg" class="mbk">
-      <div class="modal">
-        <h3>Add Item</h3>
-        <div class="f">
-          <label>Item name</label
-          ><input type="text" id="gname" placeholder="e.g. Whole milk" />
-        </div>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px">
-          <div class="f">
-            <label>Qty</label
-            ><input type="number" id="gqty" min="1" value="1" placeholder="1" />
-          </div>
-          <div class="f">
-            <label>Unit</label>
-            <select id="gunit">
-              <option value="">—</option>
-              <option value="pcs">pcs</option>
-              <option value="kg">kg</option>
-              <option value="g">g</option>
-              <option value="L">L</option>
-              <option value="ml">ml</option>
-              <option value="pack">pack</option>
-              <option value="box">box</option>
-              <option value="bag">bag</option>
-              <option value="can">can</option>
-              <option value="bottle">bottle</option>
-            </select>
-          </div>
-        </div>
-        <div class="f">
-          <label>Category</label>
-          <select id="gcat">
-            <option value="🥦 Produce">🥦 Produce</option>
-            <option value="🥩 Meat">🥩 Meat</option>
-            <option value="🥛 Dairy">🥛 Dairy</option>
-            <option value="🥖 Bakery">🥖 Bakery</option>
-            <option value="🧊 Frozen">🧊 Frozen</option>
-            <option value="🥫 Pantry">🥫 Pantry</option>
-            <option value="🧴 Household">🧴 Household</option>
-            <option value="🫙 Drinks">🫙 Drinks</option>
-            <option value="🍬 Snacks">🍬 Snacks</option>
-            <option value="💊 Health">💊 Health</option>
-            <option value="🛒 Other">🛒 Other</option>
-          </select>
-        </div>
-        <div class="f">
-          <label>Note (optional)</label
-          ><input type="text" id="gnote" placeholder="e.g. brand, size…" />
-        </div>
-        <div class="ma">
-          <button class="btn btn-g" onclick="window._utils?.closeModal?.()">
-            Cancel
-          </button>
-          <button class="btn btn-p" onclick="window._grocery?.create?.()">
-            Add to list
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- EDIT TODO MODAL -->
-    <div id="mt-edit" class="mbk">
-      <div class="modal">
-        <h3>Edit Task</h3>
-        <div class="f">
-          <label>Title</label>
-          <input type="text" id="ttitle-edit" placeholder="What needs to be done?" />
-        </div>
-        <div class="f">
-          <label>Priority</label>
-          <select id="tpri-edit">
-            <option value="none">None</option>
-            <option value="low">Low</option>
-            <option value="medium">Medium</option>
-            <option value="high">High</option>
-          </select>
-        </div>
-        <div class="f">
-          <label>Due Date</label><input type="date" id="tdue-edit" />
-        </div>
-        <div class="f">
-          <label>Repeat</label>
-          <select id="trepeat-edit">
-            <option value="none">No repeat</option>
-            <option value="daily">Daily</option>
-            <option value="weekly">Weekly</option>
-          </select>
-        </div>
-        <input type="hidden" id="tedit-id" />
-        <div class="ma">
-          <button class="btn btn-g" onclick="window._utils?.closeModal?.()">Cancel</button>
-          <button class="btn btn-p" onclick="window._todos?.saveEdit?.()">Save</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- EDIT HABIT MODAL -->
-    <div id="mh-edit" class="mbk">
-      <div class="modal">
-        <h3>Edit Habit</h3>
-        <div class="f">
-          <label>Name</label>
-          <input type="text" id="hname-edit" placeholder="e.g. Read 20 min" />
-        </div>
-        <div class="f">
-          <label>Colour</label>
-          <div class="swatches" id="hswatches-edit"></div>
-        </div>
-        <div class="f">
-          <label>Weekly goal <span style="color:var(--t3);font-weight:400">(days, 0 = off)</span></label>
-          <input type="number" id="hweekly-edit" min="0" max="7" value="0" />
-        </div>
-        <div class="f">
-          <label>Daily reminder</label>
-          <div style="display:flex;align-items:center;gap:10px">
-            <input type="time" id="hreminder-time-edit" style="flex:1" />
-            <label style="display:flex;align-items:center;gap:5px;font-size:13px;white-space:nowrap">
-              <input type="checkbox" id="hreminder-enabled-edit" /> On
-            </label>
-          </div>
-        </div>
-        <input type="hidden" id="hedit-id" />
-        <div class="ma">
-          <button class="btn btn-g" onclick="window._utils?.closeModal?.()">Cancel</button>
-          <button class="btn btn-p" onclick="window._habits?.saveEdit?.()">Save</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- EDIT EVENT MODAL -->
-    <div id="me-edit" class="mbk">
-      <div class="modal">
-        <h3>Edit Event</h3>
-        <input type="hidden" id="eeedit-id" />
-        <div class="f"><label>Title</label><input type="text" id="eetitle" placeholder="Event name" /></div>
-        <div class="f"><label>Date</label><input type="date" id="eedate" /></div>
-        <div class="f"><label>Time (optional)</label><input type="time" id="eetime" /></div>
-        <div class="f"><label>Notes (optional)</label><textarea id="eenotes" placeholder="Optional notes…"></textarea></div>
-        <div class="ma">
-          <button class="btn btn-g" onclick="window._utils?.closeModal?.()">Cancel</button>
-          <button class="btn btn-p" onclick="window._calendar?.saveEdit?.()">Save</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- LOGOUT CONFIRMATION MODAL -->
-    <div id="m-logout" class="mbk">
-      <div class="modal modal-sm">
-        <div class="logout-avatar-wrap">
-          <div id="logout-avatar" class="logout-avatar">👤</div>
-        </div>
-        <h3 style="text-align:center;margin-bottom:4px">Sign out?</h3>
-        <p id="logout-user-info" style="text-align:center;font-size:13px;color:var(--t3);margin-bottom:20px">Your data stays safely in the cloud.</p>
-        <div class="ma">
-          <button class="btn btn-g" onclick="window._utils?.closeModal?.()">Cancel</button>
-          <button class="btn btn-d" onclick="window._auth?.confirmLogout?.()">Sign out</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- ADD GAME MODAL -->
-    <div id="mg-add" class="mbk">
-      <div class="modal">
-        <h3>Add Game</h3>
-
-        <!-- RAWG search -->
-        <div class="f">
-          <label>Search game</label>
-          <div class="game-search-wrap">
-            <input type="text" id="game-search-input" placeholder="e.g. Elden Ring…" autocomplete="off"
-              oninput="window._games?.liveSearch?.()" />
-            <div id="game-search-results" class="game-search-results"></div>
-          </div>
-        </div>
-
-        <!-- Selected game preview -->
-        <div id="game-selected-preview" class="game-selected-preview" style="display:none"></div>
-
-        <!-- Hidden fields populated by API selection or manual entry -->
-        <input type="hidden" id="gnew-rawg-id" />
-        <input type="hidden" id="gnew-cover" />
-
-        <!-- Manual title fallback (shown only if not from API) -->
-        <div class="f" id="gnew-title-row">
-          <label>Title <span style="color:var(--t3);font-weight:400;font-size:12px">(or type manually)</span></label>
-          <input type="text" id="gnew-title" placeholder="Game title" />
-        </div>
-
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-          <div class="f">
-            <label>Status</label>
-            <select id="gnew-status">
-              <option value="wishlist">🕹 Want to Play</option>
-              <option value="playing">▶ Playing</option>
-              <option value="completed">✅ Completed</option>
-              <option value="dropped">💀 Dropped</option>
-            </select>
-          </div>
-          <div class="f">
-            <label>Rating <span style="color:var(--t3);font-weight:400">/ 10</span></label>
-            <input type="number" id="gnew-rating" min="1" max="10" placeholder="—" />
-          </div>
-        </div>
-
-        <div class="f">
-          <label>Platform</label>
-          <input type="text" id="gnew-platform" placeholder="e.g. PC, PS5, Switch…" />
-        </div>
-        <div class="f">
-          <label>Notes (optional)</label>
-          <textarea id="gnew-notes" placeholder="Impressions, tips, story notes…" rows="2"></textarea>
-        </div>
-
-        <div class="ma">
-          <button class="btn btn-g" onclick="window._utils?.closeModal?.()">Cancel</button>
-          <button class="btn btn-p" onclick="window._games?.create?.()">Add to backlog</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- EDIT GAME MODAL -->
-    <div id="mg-edit" class="mbk">
-      <div class="modal">
-        <h3>Edit Game</h3>
-        <input type="hidden" id="gedit-id" />
-
-        <div id="gedit-preview" class="game-selected-preview" style="margin-bottom:14px"></div>
-
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-          <div class="f">
-            <label>Status</label>
-            <select id="gedit-status">
-              <option value="wishlist">🕹 Want to Play</option>
-              <option value="playing">▶ Playing</option>
-              <option value="completed">✅ Completed</option>
-              <option value="dropped">💀 Dropped</option>
-            </select>
-          </div>
-          <div class="f">
-            <label>Rating / 10</label>
-            <input type="number" id="gedit-rating" min="1" max="10" placeholder="—" />
-          </div>
-        </div>
-
-        <div class="f">
-          <label>Platform</label>
-          <input type="text" id="gedit-platform" placeholder="e.g. PC, PS5, Switch…" />
-        </div>
-        <div class="f">
-          <label>Notes (optional)</label>
-          <textarea id="gedit-notes" rows="3"></textarea>
-        </div>
-
-        <div class="ma">
-          <button class="btn btn-g" onclick="window._utils?.closeModal?.()">Cancel</button>
-          <button class="btn btn-p" onclick="window._games?.saveEdit?.()">Save</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- CONTACT FORM MODAL -->
-    <div id="contact" class="mbk">
-      <div class="modal">
-        <h3>Report a Bug or Contact Us</h3>
-        <form id="contact-form" class="contact-form">
-          <div class="f">
-            <label>Your Email</label>
-            <input
-              type="email"
-              name="email"
-              id="contact-email"
-              placeholder="your@email.com"
-              required
-            />
-          </div>
-          <div class="f">
-            <label>Subject</label>
-            <select name="subject" required>
-              <option value="">Select a category...</option>
-              <option value="Bug Report">🐛 Bug Report</option>
-              <option value="Feature Request">💡 Feature Request</option>
-              <option value="Data Issue">📊 Data/Sync Issue</option>
-              <option value="Performance">⚡ Performance Issue</option>
-              <option value="General Feedback">📝 General Feedback</option>
-              <option value="Other">❓ Other</option>
-            </select>
-          </div>
-          <div class="f">
-            <label>Message</label>
-            <textarea
-              name="message"
-              id="contact-message"
-              placeholder="Please describe the issue or suggestion..."
-              rows="6"
-              style="resize: vertical"
-              required
-            ></textarea>
-          </div>
-          <div class="f">
-            <label>App Version</label>
-            <input
-              type="text"
-              name="version"
-              id="contact-version"
-              placeholder="e.g., v1.0"
-              readonly
-            />
-          </div>
-          <div class="ma">
-            <button
-              type="button"
-              class="btn btn-g"
-              onclick="window._utils?.closeModal?.()"
-            >
-              Cancel
-            </button>
-            <button type="submit" class="btn btn-p" id="submit-contact">
-              Send Report
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <!-- Firebase Libraries -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-
-    <!-- Application Scripts -->
-    <script src="js/app.js" type="module"></script>
-
-    <!-- Service Worker Registration -->
-    <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js')
-            .catch(err => console.warn('SW registration failed:', err));
-        });
-      }
-    </script>
-  </body>
+        <!-- Service Worker Registration -->
+        <script>
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker
+                        .register('/sw.js')
+                        .catch((err) => console.warn('SW registration failed:', err));
+                });
+            }
+        </script>
+    </body>
 </html>

@@ -4,621 +4,621 @@
 
 /* ── Keyframes ── */
 @keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(18px);
-  } 
-  to {
-    opacity: 1;
-    transform: none;
-  }
+    from {
+        opacity: 0;
+        transform: translateY(18px);
+    }
+    to {
+        opacity: 1;
+        transform: none;
+    }
 }
 @keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-12px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
+    from {
+        opacity: 0;
+        transform: translateY(-12px);
+    }
+    to {
+        opacity: 1;
+        transform: none;
+    }
 }
 @keyframes slideLeft {
-  from {
-    opacity: 0;
-    transform: translateX(18px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
+    from {
+        opacity: 0;
+        transform: translateX(18px);
+    }
+    to {
+        opacity: 1;
+        transform: none;
+    }
 }
 @keyframes popIn {
-  from {
-    opacity: 0;
-    transform: scale(0.8);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
 @keyframes pulse {
-  0%,
-  100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.06);
-  }
+    0%,
+    100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.06);
+    }
 }
 @keyframes shimmer {
-  from {
-    background-position: 200% center;
-  }
-  to {
-    background-position: -200% center;
-  }
+    from {
+        background-position: 200% center;
+    }
+    to {
+        background-position: -200% center;
+    }
 }
 @keyframes checkPop {
-  0% {
-    transform: scale(1);
-  }
-  40% {
-    transform: scale(1.35);
-  }
-  70% {
-    transform: scale(0.88);
-  }
-  100% {
-    transform: scale(1);
-  }
+    0% {
+        transform: scale(1);
+    }
+    40% {
+        transform: scale(1.35);
+    }
+    70% {
+        transform: scale(0.88);
+    }
+    100% {
+        transform: scale(1);
+    }
 }
 @keyframes rowSlideIn {
-  from {
-    opacity: 0;
-    transform: translateX(-14px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
+    from {
+        opacity: 0;
+        transform: translateX(-14px);
+    }
+    to {
+        opacity: 1;
+        transform: none;
+    }
 }
 @keyframes dotBounce {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-5px);
-  }
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-5px);
+    }
 }
 @keyframes ripple {
-  from {
-    transform: scale(0);
-    opacity: 0.35;
-  }
-  to {
-    transform: scale(3);
-    opacity: 0;
-  }
+    from {
+        transform: scale(0);
+        opacity: 0.35;
+    }
+    to {
+        transform: scale(3);
+        opacity: 0;
+    }
 }
 @keyframes detailIn {
-  from {
-    opacity: 0;
-    transform: translateY(-8px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: none;
+    }
 }
 @keyframes statCount {
-  from {
-    opacity: 0;
-    transform: scale(0.7) translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
+    from {
+        opacity: 0;
+        transform: scale(0.7) translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: none;
+    }
 }
 @keyframes noteIn {
-  from {
-    opacity: 0;
-    transform: translateX(10px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
+    from {
+        opacity: 0;
+        transform: translateX(10px);
+    }
+    to {
+        opacity: 1;
+        transform: none;
+    }
 }
 @keyframes heatIn {
-  from {
-    transform: scale(0);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
+    from {
+        transform: scale(0);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
 }
 @keyframes navPop {
-  from {
-    transform: translateX(-4px);
-    opacity: 0.5;
-  }
-  to {
-    transform: none;
-    opacity: 1;
-  }
+    from {
+        transform: translateX(-4px);
+        opacity: 0.5;
+    }
+    to {
+        transform: none;
+        opacity: 1;
+    }
 }
 @keyframes fabSpin {
-  from {
-    transform: rotate(0deg) scale(1);
-  }
-  to {
-    transform: rotate(90deg) scale(1.08);
-  }
+    from {
+        transform: rotate(0deg) scale(1);
+    }
+    to {
+        transform: rotate(90deg) scale(1.08);
+    }
 }
 @keyframes fabSpinBack {
-  from {
-    transform: rotate(90deg) scale(1.08);
-  }
-  to {
-    transform: rotate(0deg) scale(1);
-  }
+    from {
+        transform: rotate(90deg) scale(1.08);
+    }
+    to {
+        transform: rotate(0deg) scale(1);
+    }
 }
 @keyframes calCellIn {
-  from {
-    opacity: 0;
-    transform: scale(0.92);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
+    from {
+        opacity: 0;
+        transform: scale(0.92);
+    }
+    to {
+        opacity: 1;
+        transform: none;
+    }
 }
 @keyframes toastIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px) scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: none;
+    }
 }
 @keyframes toastOut {
-  from {
-    opacity: 1;
-    transform: none;
-  }
-  to {
-    opacity: 0;
-    transform: translateY(10px);
-  }
+    from {
+        opacity: 1;
+        transform: none;
+    }
+    to {
+        opacity: 0;
+        transform: translateY(10px);
+    }
 }
 
 /* ── Page transitions ── */
 .page.active {
-  animation: slideUp 0.28s cubic-bezier(0.22, 0.68, 0, 1.2) both;
+    animation: slideUp 0.28s cubic-bezier(0.22, 0.68, 0, 1.2) both;
 }
 
 /* ── Nav items ── */
 .nb {
-  transition:
-    background var(--ease),
-    color var(--ease),
-    transform 0.15s;
+    transition:
+        background var(--ease),
+        color var(--ease),
+        transform 0.15s;
 }
 .nb:hover {
-  transform: translateX(3px);
+    transform: translateX(3px);
 }
 .nb.active {
-  animation: navPop 0.22s ease both;
+    animation: navPop 0.22s ease both;
 }
 .nb .ic {
-  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 .nb:hover .ic {
-  transform: scale(1.25) rotate(-5deg);
+    transform: scale(1.25) rotate(-5deg);
 }
 .nb.active .ic {
-  transform: scale(1.15);
+    transform: scale(1.15);
 }
 
 /* ── Brand icon pulse on load ── */
 .brand-ico {
-  animation: pulse 3s ease-in-out 1s infinite;
+    animation: pulse 3s ease-in-out 1s infinite;
 }
 
 /* ── FAB ── */
 .fab {
-  transition:
-    transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1),
-    box-shadow 0.18s;
+    transition:
+        transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1),
+        box-shadow 0.18s;
 }
 .fab:hover {
-  transform: scale(1.12) rotate(8deg);
+    transform: scale(1.12) rotate(8deg);
 }
 .fab:active {
-  animation: none;
-  transform: scale(0.92);
+    animation: none;
+    transform: scale(0.92);
 }
 
 /* ── Buttons ── */
 .btn {
-  transition:
-    opacity var(--ease),
-    transform 0.12s cubic-bezier(0.34, 1.56, 0.64, 1),
-    box-shadow 0.15s;
+    transition:
+        opacity var(--ease),
+        transform 0.12s cubic-bezier(0.34, 1.56, 0.64, 1),
+        box-shadow 0.15s;
 }
 .btn-p:hover {
-  box-shadow: 0 4px 14px rgba(91, 110, 245, 0.35);
+    box-shadow: 0 4px 14px rgba(91, 110, 245, 0.35);
 }
 .btn:active {
-  transform: scale(0.93);
+    transform: scale(0.93);
 }
 .ico-btn {
-  transition:
-    background var(--ease),
-    color var(--ease),
-    transform 0.12s;
+    transition:
+        background var(--ease),
+        color var(--ease),
+        transform 0.12s;
 }
 .ico-btn:hover {
-  transform: scale(1.15);
+    transform: scale(1.15);
 }
 .ico-btn:active {
-  transform: scale(0.88);
+    transform: scale(0.88);
 }
 
 /* ── Cards ── */
 .card {
-  transition:
-    background var(--ease),
-    border-color var(--ease),
-    box-shadow 0.22s,
-    transform 0.22s;
+    transition:
+        background var(--ease),
+        border-color var(--ease),
+        box-shadow 0.22s,
+        transform 0.22s;
 }
 .hcard:hover {
-  box-shadow: var(--sh1);
-  transform: translateY(-2px);
+    box-shadow: var(--sh1);
+    transform: translateY(-2px);
 }
 .exp-stat:hover {
-  box-shadow: var(--sh1);
-  transform: translateY(-2px);
+    box-shadow: var(--sh1);
+    transform: translateY(-2px);
 }
 .chart-box:hover {
-  box-shadow: var(--sh1);
+    box-shadow: var(--sh1);
 }
 
 /* ── Habit cards stagger in ── */
 .hcard {
-  animation: slideUp 0.32s cubic-bezier(0.22, 0.68, 0, 1.2) both;
+    animation: slideUp 0.32s cubic-bezier(0.22, 0.68, 0, 1.2) both;
 }
 .hcard:nth-child(1) {
-  animation-delay: 0.04s;
+    animation-delay: 0.04s;
 }
 .hcard:nth-child(2) {
-  animation-delay: 0.09s;
+    animation-delay: 0.09s;
 }
 .hcard:nth-child(3) {
-  animation-delay: 0.14s;
+    animation-delay: 0.14s;
 }
 .hcard:nth-child(4) {
-  animation-delay: 0.19s;
+    animation-delay: 0.19s;
 }
 .hcard:nth-child(5) {
-  animation-delay: 0.24s;
+    animation-delay: 0.24s;
 }
 .hcard:nth-child(6) {
-  animation-delay: 0.29s;
+    animation-delay: 0.29s;
 }
 
 /* ── Habit check button ── */
 .hchk {
-  transition:
-    background 0.22s,
-    border-color 0.22s,
-    transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition:
+        background 0.22s,
+        border-color 0.22s,
+        transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 .hchk:hover {
-  transform: scale(1.18);
+    transform: scale(1.18);
 }
 .hchk:active {
-  transform: scale(0.88);
+    transform: scale(0.88);
 }
 .hchk.done {
-  animation: checkPop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    animation: checkPop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
 /* ── Heatmap cells stagger ── */
 .hc {
-  animation: heatIn 0.25s ease both;
+    animation: heatIn 0.25s ease both;
 }
 
 /* ── Todo rows ── */
 .ti {
-  animation: rowSlideIn 0.24s ease both;
+    animation: rowSlideIn 0.24s ease both;
 }
 .ti:nth-child(1) {
-  animation-delay: 0.03s;
+    animation-delay: 0.03s;
 }
 .ti:nth-child(2) {
-  animation-delay: 0.07s;
+    animation-delay: 0.07s;
 }
 .ti:nth-child(3) {
-  animation-delay: 0.11s;
+    animation-delay: 0.11s;
 }
 .ti:nth-child(4) {
-  animation-delay: 0.15s;
+    animation-delay: 0.15s;
 }
 .ti:nth-child(5) {
-  animation-delay: 0.19s;
+    animation-delay: 0.19s;
 }
 .ti:nth-child(6) {
-  animation-delay: 0.23s;
+    animation-delay: 0.23s;
 }
 .ti:nth-child(7) {
-  animation-delay: 0.27s;
+    animation-delay: 0.27s;
 }
 .ti:nth-child(8) {
-  animation-delay: 0.31s;
+    animation-delay: 0.31s;
 }
 .ti {
-  transition:
-    background var(--ease),
-    transform 0.15s;
+    transition:
+        background var(--ease),
+        transform 0.15s;
 }
 .ti:hover {
-  transform: translateX(3px);
+    transform: translateX(3px);
 }
 
 /* ── Checkbox ripple wrapper ── */
-.ti input[type="checkbox"] {
-  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+.ti input[type='checkbox'] {
+    transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
-.ti input[type="checkbox"]:checked {
-  animation: checkPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+.ti input[type='checkbox']:checked {
+    animation: checkPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
 /* ── Calendar grid cells ── */
 .cc {
-  transition:
-    background var(--ease),
-    transform 0.15s,
-    outline 0.15s;
+    transition:
+        background var(--ease),
+        transform 0.15s,
+        outline 0.15s;
 }
 .cc:hover {
-  transform: scale(1.04);
-  z-index: 1;
-  position: relative;
-  box-shadow: var(--sh1);
+    transform: scale(1.04);
+    z-index: 1;
+    position: relative;
+    box-shadow: var(--sh1);
 }
 .cc:active {
-  transform: scale(0.96);
+    transform: scale(0.96);
 }
 .ce {
-  animation: fadeIn 0.18s ease both;
-  transition: opacity 0.15s;
+    animation: fadeIn 0.18s ease both;
+    transition: opacity 0.15s;
 }
 .cc:hover .ce {
-  opacity: 0.85;
+    opacity: 0.85;
 }
 
 /* ── Calendar detail panel ── */
 .detail.open {
-  animation: detailIn 0.25s cubic-bezier(0.22, 0.68, 0, 1.2) both;
+    animation: detailIn 0.25s cubic-bezier(0.22, 0.68, 0, 1.2) both;
 }
 .det-row {
-  animation: rowSlideIn 0.22s ease both;
+    animation: rowSlideIn 0.22s ease both;
 }
 .det-row:nth-child(2) {
-  animation-delay: 0.04s;
+    animation-delay: 0.04s;
 }
 .det-row:nth-child(3) {
-  animation-delay: 0.08s;
+    animation-delay: 0.08s;
 }
 .det-row:nth-child(4) {
-  animation-delay: 0.12s;
+    animation-delay: 0.12s;
 }
 
 /* ── Modal backdrop & card ── */
 .mbk {
-  transition: background 0.2s;
+    transition: background 0.2s;
 }
 .mbk.open {
-  animation: fadeIn 0.18s ease both;
+    animation: fadeIn 0.18s ease both;
 }
 .modal {
-  animation: popIn 0.24s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    animation: popIn 0.24s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
 /* ── Form inputs focus ring ── */
-input[type="text"]:focus,
-input[type="number"]:focus,
-input[type="date"]:focus,
-input[type="time"]:focus,
+input[type='text']:focus,
+input[type='number']:focus,
+input[type='date']:focus,
+input[type='time']:focus,
 select:focus,
 textarea:focus {
-  animation: pulse 0.35s ease;
-  box-shadow: 0 0 0 3px rgba(91, 110, 245, 0.15);
+    animation: pulse 0.35s ease;
+    box-shadow: 0 0 0 3px rgba(91, 110, 245, 0.15);
 }
 
 /* ── Swatches ── */
 .sw {
-  transition:
-    transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1),
-    border-color 0.15s;
+    transition:
+        transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1),
+        border-color 0.15s;
 }
 
 /* ── Filter chips ── */
 .fchip {
-  transition: all 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition: all 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 .fchip:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--sh0);
+    transform: translateY(-2px);
+    box-shadow: var(--sh0);
 }
 .fchip:active {
-  transform: scale(0.93);
+    transform: scale(0.93);
 }
 .fchip.active {
-  animation: popIn 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    animation: popIn 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
 /* ── Expense rows ── */
 .exp-row {
-  animation: rowSlideIn 0.22s ease both;
+    animation: rowSlideIn 0.22s ease both;
 }
 .exp-row:nth-child(1) {
-  animation-delay: 0.04s;
+    animation-delay: 0.04s;
 }
 .exp-row:nth-child(2) {
-  animation-delay: 0.09s;
+    animation-delay: 0.09s;
 }
 .exp-row:nth-child(3) {
-  animation-delay: 0.14s;
+    animation-delay: 0.14s;
 }
 .exp-row:nth-child(4) {
-  animation-delay: 0.19s;
+    animation-delay: 0.19s;
 }
 .exp-row:nth-child(5) {
-  animation-delay: 0.24s;
+    animation-delay: 0.24s;
 }
 .exp-row:nth-child(6) {
-  animation-delay: 0.29s;
+    animation-delay: 0.29s;
 }
 .exp-row {
-  transition:
-    background var(--ease),
-    transform 0.15s;
+    transition:
+        background var(--ease),
+        transform 0.15s;
 }
 .exp-row:hover {
-  transform: translateX(3px);
+    transform: translateX(3px);
 }
 
 /* ── Expense stat values ── */
 .exp-stat .val {
-  animation: statCount 0.4s cubic-bezier(0.22, 0.68, 0, 1.2) both;
+    animation: statCount 0.4s cubic-bezier(0.22, 0.68, 0, 1.2) both;
 }
 .exp-stat:nth-child(1) .val {
-  animation-delay: 0.05s;
+    animation-delay: 0.05s;
 }
 .exp-stat:nth-child(2) .val {
-  animation-delay: 0.12s;
+    animation-delay: 0.12s;
 }
 .exp-stat:nth-child(3) .val {
-  animation-delay: 0.19s;
+    animation-delay: 0.19s;
 }
 
 /* ── Notes list items ── */
 .note-item {
-  transition:
-    background var(--ease),
-    border-left-color 0.15s,
-    transform 0.15s;
+    transition:
+        background var(--ease),
+        border-left-color 0.15s,
+        transform 0.15s;
 }
 .note-item:hover {
-  transform: translateX(3px);
+    transform: translateX(3px);
 }
 .note-item.active {
-  animation: noteIn 0.22s ease both;
+    animation: noteIn 0.22s ease both;
 }
 
 /* ── Pomodoro ring ── */
 .ring-wrap {
-  transition: filter 0.3s;
+    transition: filter 0.3s;
 }
 .ring-wrap:hover {
-  filter: drop-shadow(0 0 10px rgba(91, 110, 245, 0.3));
+    filter: drop-shadow(0 0 10px rgba(91, 110, 245, 0.3));
 }
 
 /* ── Pomodoro dots ── */
 .pdot {
-  transition:
-    background 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
-    transform 0.3s;
+    transition:
+        background 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+        transform 0.3s;
 }
 .pdot.done {
-  transform: scale(1.25);
-  animation: dotBounce 0.4s ease;
+    transform: scale(1.25);
+    animation: dotBounce 0.4s ease;
 }
 
 /* ── Pomodoro mode tabs ── */
 .ptab {
-  transition:
-    background var(--ease),
-    color var(--ease),
-    transform 0.15s;
+    transition:
+        background var(--ease),
+        color var(--ease),
+        transform 0.15s;
 }
 .ptab:hover {
-  transform: translateY(-1px);
+    transform: translateY(-1px);
 }
 .ptab.active {
-  animation: popIn 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    animation: popIn 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
 /* ── Pomodoro time display pulse when running ── */
 .ptime.running {
-  animation: pulse 1s ease-in-out infinite;
+    animation: pulse 1s ease-in-out infinite;
 }
 
 /* ── Empty states ── */
 .empty {
-  animation: fadeIn 0.4s ease both;
+    animation: fadeIn 0.4s ease both;
 }
 .empty-ic {
-  animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s both;
+    animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s both;
 }
 
 /* ── Toast notification ── */
 #toast {
-  animation: toastIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    animation: toastIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 #toast.hide {
-  animation: toastOut 0.2s ease both;
+    animation: toastOut 0.2s ease both;
 }
 
 /* ── Chip entrance ── */
 .chip {
-  animation: popIn 0.18s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    animation: popIn 0.18s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
 /* ── Grocery items ── */
 .gr-item {
-  animation: rowSlideIn 0.22s ease both;
+    animation: rowSlideIn 0.22s ease both;
 }
 .gr-item:nth-child(1) {
-  animation-delay: 0.03s;
+    animation-delay: 0.03s;
 }
 .gr-item:nth-child(2) {
-  animation-delay: 0.07s;
+    animation-delay: 0.07s;
 }
 .gr-item:nth-child(3) {
-  animation-delay: 0.11s;
+    animation-delay: 0.11s;
 }
 .gr-item:nth-child(4) {
-  animation-delay: 0.15s;
+    animation-delay: 0.15s;
 }
 .gr-item:nth-child(5) {
-  animation-delay: 0.19s;
+    animation-delay: 0.19s;
 }
 .gr-item:nth-child(6) {
-  animation-delay: 0.23s;
+    animation-delay: 0.23s;
 }
 .gr-cb {
-  animation: popIn 0.18s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    animation: popIn 0.18s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 .gr-item.checked .gr-cb {
-  animation: checkPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    animation: checkPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
