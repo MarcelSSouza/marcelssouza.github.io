@@ -11,7 +11,7 @@ import {
     toast, openModal, closeModal, showPage, byId, queryAll
 } from './utils.js';
 
-import { S, initFirebase, getCurrentUser, authAction, updateAuthUI, setAuthLoading } from './storage.js';
+import { S, initFirebase, getCurrentUser, authAction, doSignOut } from './storage.js';
 
 // ══════════════════════════════════════════════════════════
 // APPLICATION STATE
@@ -110,7 +110,7 @@ document.addEventListener('click', (e) => {
 
 window._utils = { closeModal, openModal, toast };
 window._darkMode = darkMode;
-window._auth = { action: authAction };
+window._auth = { action: authAction, confirmLogout: doSignOut };
 window._nav = nav;
 
 // ══════════════════════════════════════════════════════════
@@ -156,12 +156,24 @@ const fabClick = () => {
     const id = map[state.page];
     if (!id) return;
 
-    if (state.page === 'habits') renderSwatches();
+    if (state.page === 'habits') {
+        renderSwatches();
+        byId('hname').value = '';
+        byId('hweekly').value = '0';
+        byId('hreminder-time').value = '';
+        byId('hreminder-enabled').checked = false;
+    }
     if (state.page === 'calendar') {
         byId('edate').value = state.calSel || today();
         byId('etime').value = '';
         byId('etitle').value = '';
         byId('enotes').value = '';
+    }
+    if (state.page === 'todos') {
+        byId('ttitle').value = '';
+        byId('tpri').value = 'none';
+        byId('tdue').value = '';
+        byId('trepeat').value = 'none';
     }
     if (state.page === 'expenses') {
         byId('xdate').value = today();
@@ -1360,6 +1372,8 @@ const checkGroceryShare = () => {
         // Navigate to grocery page
         window._appState.page = 'grocery';
         showPage('grocery', render);
+        // Re-hide FAB after showPage (showPage re-enables it for non-pomodoro pages)
+        byId('fab').style.display = 'none';
     } catch (e) {
         toast('❌ Invalid share link');
     }

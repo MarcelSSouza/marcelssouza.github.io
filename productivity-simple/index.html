@@ -91,19 +91,21 @@
           <div class="ph"><h2>Todos</h2></div>
           <div class="todo-toolbar">
             <input class="search-input" id="todo-search" placeholder="Search tasks…" oninput="window._todos?.search?.()" />
-            <select id="todo-filter" onchange="window._todos?.applyFilter?.()">
-              <option value="all">All</option>
-              <option value="active">Active</option>
-              <option value="done">Done</option>
-              <option value="high">High priority</option>
-              <option value="overdue">Overdue</option>
-            </select>
-            <select id="todo-sort" onchange="window._todos?.applySort?.()">
-              <option value="priority">Priority</option>
-              <option value="due-asc">Due ↑</option>
-              <option value="due-desc">Due ↓</option>
-              <option value="newest">Newest</option>
-            </select>
+            <div class="todo-toolbar-row">
+              <select id="todo-filter" onchange="window._todos?.applyFilter?.()">
+                <option value="all">All tasks</option>
+                <option value="active">Active</option>
+                <option value="done">Done</option>
+                <option value="high">High priority</option>
+                <option value="overdue">Overdue</option>
+              </select>
+              <select id="todo-sort" onchange="window._todos?.applySort?.()">
+                <option value="priority">Sort: Priority</option>
+                <option value="due-asc">Sort: Due ↑</option>
+                <option value="due-desc">Sort: Due ↓</option>
+                <option value="newest">Sort: Newest</option>
+              </select>
+            </div>
           </div>
           <div id="tlist"></div>
         </div>
@@ -888,6 +890,21 @@
         <div class="ma">
           <button class="btn btn-g" onclick="window._utils?.closeModal?.()">Cancel</button>
           <button class="btn btn-p" onclick="window._calendar?.saveEdit?.()">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- LOGOUT CONFIRMATION MODAL -->
+    <div id="m-logout" class="mbk">
+      <div class="modal modal-sm">
+        <div class="logout-avatar-wrap">
+          <div id="logout-avatar" class="logout-avatar">👤</div>
+        </div>
+        <h3 style="text-align:center;margin-bottom:4px">Sign out?</h3>
+        <p id="logout-user-info" style="text-align:center;font-size:13px;color:var(--t3);margin-bottom:20px">Your data stays safely in the cloud.</p>
+        <div class="ma">
+          <button class="btn btn-g" onclick="window._utils?.closeModal?.()">Cancel</button>
+          <button class="btn btn-d" onclick="window._auth?.confirmLogout?.()">Sign out</button>
         </div>
       </div>
     </div>

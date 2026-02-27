@@ -166,21 +166,21 @@ export const authAction = async () => {
     const isSignedInWithGoogle = _currentUser && !_currentUser.isAnonymous;
 
     if (isSignedInWithGoogle) {
-        // User wants to sign out
-        if (!confirm('Sign out? Your data stays in the cloud.')) return;
-
-        try {
-            setAuthLoading(true, 'Signing out…');
-            await _auth.signOut();
-            _currentUser = null;
-            setAuthLoading(false);
-            updateAuthUI(null);
-            toast('Signed out ✓');
-        } catch (err) {
-            console.error('Sign out error:', err);
-            setAuthLoading(false);
-            toast('❌ Sign out failed');
+        // Show in-app logout confirmation modal
+        const user = _currentUser;
+        const avatarEl = document.getElementById('logout-avatar');
+        const infoEl = document.getElementById('logout-user-info');
+        if (avatarEl) {
+            avatarEl.innerHTML = user.photoURL
+                ? `<img src="${user.photoURL}" referrerpolicy="no-referrer" />`
+                : '👤';
         }
+        if (infoEl) {
+            const name = user.displayName || user.email || 'your account';
+            infoEl.textContent = `Signed in as ${name}. Your data stays safely in the cloud.`;
+        }
+        window._utils?.openModal?.('m-logout');
+        return;
     } else {
         // User wants to sign in
         try {
@@ -233,6 +233,23 @@ export const authAction = async () => {
                 toast('❌ Sign-in failed');
             }
         }
+    }
+};
+
+export const doSignOut = async () => {
+    const toast = window._utils?.toast || ((msg) => console.log(msg));
+    window._utils?.closeModal?.();
+    try {
+        setAuthLoading(true, 'Signing out…');
+        await _auth.signOut();
+        _currentUser = null;
+        setAuthLoading(false);
+        updateAuthUI(null);
+        toast('Signed out ✓');
+    } catch (err) {
+        console.error('Sign out error:', err);
+        setAuthLoading(false);
+        toast('❌ Sign out failed');
     }
 };
 

@@ -1036,17 +1036,20 @@ canvas {
 }
 .todo-toolbar {
   display: flex;
+  flex-direction: column;
   gap: 8px;
   margin-bottom: 14px;
-  align-items: stretch;
 }
 .todo-toolbar .search-input {
-  flex: 1 1 0;
-  min-width: 0;
-  width: auto;
+  width: 100%;
+}
+.todo-toolbar-row {
+  display: flex;
+  gap: 8px;
 }
 .todo-toolbar select {
-  flex: 0 0 auto;
+  flex: 1 1 0;
+  min-width: 0;
   padding: 8px 10px;
   border: 1.5px solid var(--border);
   border-radius: var(--r);
@@ -1350,6 +1353,33 @@ canvas {
   text-overflow: ellipsis;
   white-space: nowrap;
   font-size: 12.5px;
+}
+
+/* ─── Logout modal ───────────────────────────────────────── */
+.modal-sm {
+  max-width: 340px;
+}
+.logout-avatar-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 14px;
+}
+.logout-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--pdim);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  overflow: hidden;
+}
+.logout-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
 }
 
 /* Loading spinner overlay */
