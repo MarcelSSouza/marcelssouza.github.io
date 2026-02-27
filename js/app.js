@@ -1200,6 +1200,12 @@ const togglePinNote = () => {
 const showNoteEditor = show => {
     byId('note-editor').style.display = show ? 'flex' : 'none';
     byId('no-note').style.display = show ? 'none' : 'flex';
+    // On mobile: toggle between list view and editor view
+    const layout = document.querySelector('.notes-layout');
+    if (layout) {
+        layout.classList.toggle('editor-open', show);
+        layout.classList.toggle('list-open', !show);
+    }
 };
 
 const updateNoteMeta = n => {
@@ -1219,10 +1225,18 @@ const renderNotesMeta = () => {
 
 const noteSearch = () => renderNotes(false);
 
+const noteBackToList = () => {
+    const state = window._appState;
+    state.activeNote = null;
+    showNoteEditor(false); // this also adds list-open on mobile
+    renderNotes(false);
+};
+
 const renderNotes = (resetEditor = true) => {
     const state = window._appState;
     const list = byId('notes-list');
     const q = (byId('note-search')?.value || '').toLowerCase();
+    const layout = document.querySelector('.notes-layout');
 
     if (!state.notes.length) {
         list.innerHTML = `<div class="empty" style="padding:40px 20px"><span class="empty-ic">📝</span>No notes yet</div>`;
@@ -1231,6 +1245,12 @@ const renderNotes = (resetEditor = true) => {
             showNoteEditor(false);
         }
         return;
+    }
+
+    // On mobile: if no note is active, show the list so user can pick one
+    if (layout && !state.activeNote) {
+        layout.classList.add('list-open');
+        layout.classList.remove('editor-open');
     }
 
     // Pinned first, then by updatedAt
@@ -1252,7 +1272,7 @@ const renderNotes = (resetEditor = true) => {
     </div>`).join('');
 };
 
-window._notes = { save: noteSave, delete: noteDelete, select: selectNote, search: noteSearch, pin: togglePinNote };
+window._notes = { save: noteSave, delete: noteDelete, select: selectNote, search: noteSearch, pin: togglePinNote, backToList: noteBackToList };
 
 // ══════════════════════════════════════════════════════════
 // GAMES BACKLOG

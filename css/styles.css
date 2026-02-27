@@ -1191,6 +1191,10 @@ canvas {
   align-items: center;
   gap: 10px;
 }
+/* Back button only shown on mobile */
+.note-back-btn {
+  display: none;
+}
 .note-title-input {
   flex: 1;
   border: none;
@@ -2035,17 +2039,23 @@ canvas {
     flex-wrap: wrap;
   }
 
-  /* Notes: single column, hide list panel by default */
+  /* Notes: single-column — list or editor, never both */
   .notes-layout {
     grid-template-columns: 1fr;
     height: calc(100dvh - 7.5rem);
   }
-  .notes-list {
-    display: none;
-  }
-  .notes-layout.list-open .notes-list {
-    display: block;
-  }
+  /* Default: list visible, editor/placeholder hidden */
+  .notes-list { display: block; }
+  .note-editor { display: none !important; }
+  .no-note    { display: none !important; }
+  /* list-open: same as default (explicit alias used by JS) */
+  .notes-layout.list-open .notes-list { display: block; }
+  .notes-layout.list-open .note-editor { display: none !important; }
+  .notes-layout.list-open .no-note    { display: none !important; }
+  /* editor-open: list hidden, editor visible */
+  .notes-layout.editor-open .notes-list  { display: none; }
+  .notes-layout.editor-open .note-editor { display: flex !important; }
+  .note-back-btn { display: flex; }
 
   /* Settings row: stack vertically */
   .settings-row {
