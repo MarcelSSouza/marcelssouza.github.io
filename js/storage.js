@@ -62,7 +62,7 @@ export const initFirebase = () => {
 
         const fbApp = firebase.initializeApp({
             apiKey: "AIzaSyC5r6j4k3Nxduv4V4fEzjRrcV3_y3ohkrQ",
-            authDomain: "focus-81bf0.web.app",
+            authDomain: "focus-81bf0.firebaseapp.com",
             projectId: "focus-81bf0",
             storageBucket: "focus-81bf0.firebasestorage.app",
             messagingSenderId: "216712938115",
