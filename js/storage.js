@@ -17,6 +17,18 @@ let _firestoreListener = null; // Real-time listener
 // Storage Abstraction
 // ──────────────────────────────────────────────────────────
 
+// Map localStorage keys → Firestore field names
+const KEY_TO_FIELD = {
+    'h2': 'habits',
+    'hl2': 'hlog',
+    't2': 'todos',
+    'ev2': 'calEvents',
+    'ex2': 'expenses',
+    'nt2': 'notes',
+    'gr2': 'grocery',
+    'gm2': 'games'
+};
+
 export const S = {
     get: (k, d) => {
         try {
@@ -29,7 +41,8 @@ export const S = {
         localStorage.setItem(k, JSON.stringify(v));
         // Don't trigger save if we're currently loading from Firebase
         if (!_isLoadingFromFirebase) {
-            dbSave();
+            const field = KEY_TO_FIELD[k];
+            if (field) dbSave(field, v);
         }
     }
 };
@@ -264,36 +277,47 @@ export const doSignOut = async () => {
 // Firebase Sync
 // ──────────────────────────────────────────────────────────
 
-export const dbSave = () => {
-    if (!_currentUser || !_db) {
-        console.log('dbSave skipped: user or db not ready');
-        return;
+// Pending field updates, batched per debounce window
+let _pendingUpdates = {};
+
+export const dbSave = (field, value) => {
+    if (!_currentUser || !_db) return;
+
+    // Accumulate changed fields
+    if (field !== undefined) {
+        _pendingUpdates[field] = value;
     }
 
     clearTimeout(_saveTimer);
     _saveTimer = setTimeout(() => {
-        const state = window._appState;
-        console.log('💾 Saving to Firebase:', {
-            notes: state.notes?.length || 0,
-            todos: state.todos?.length || 0,
-            grocery: state.grocery?.length || 0,
-            habits: state.habits?.length || 0
-        });
+        const updates = { ..._pendingUpdates };
+        _pendingUpdates = {};
 
-        _db.collection('users').doc(_currentUser.uid).set({
-            habits: state.habits,
-            hlog: state.hlog,
-            todos: state.todos,
-            calEvents: state.calEvents,
-            expenses: state.expenses,
-            notes: state.notes,
-            grocery: state.grocery,
-            games: state.games
-        }).then(() => {
-            console.log('✓ Saved to Firebase successfully');
-        }).catch(e => {
-            console.error('Firestore save failed:', e);
-        });
+        if (Object.keys(updates).length === 0) return;
+
+        console.log('💾 Saving to Firebase (fields):', Object.keys(updates));
+
+        _db.collection('users').doc(_currentUser.uid).update(updates)
+            .then(() => {
+                console.log('✓ Saved to Firebase successfully');
+            })
+            .catch(e => {
+                // If document doesn't exist yet, fall back to set()
+                if (e.code === 'not-found') {
+                    const state = window._appState;
+                    return _db.collection('users').doc(_currentUser.uid).set({
+                        habits: state.habits,
+                        hlog: state.hlog,
+                        todos: state.todos,
+                        calEvents: state.calEvents,
+                        expenses: state.expenses,
+                        notes: state.notes,
+                        grocery: state.grocery,
+                        games: state.games
+                    });
+                }
+                console.error('Firestore save failed:', e);
+            });
     }, 800);
 };
 
