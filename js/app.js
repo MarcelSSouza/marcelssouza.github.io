@@ -1765,40 +1765,13 @@ const contactForm = {
             return;
         }
 
-        const submitBtn = byId('submit-contact');
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Sending…';
-
-        fetch('https://formspree.io/f/myzojlwp', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-            body: JSON.stringify({
-                email,
-                subject,
-                message,
-                version: byId('contact-version').value,
-                sent: new Date().toLocaleString()
-            })
-        })
-            .then(response => response.json().then(data => ({ ok: response.ok, data })))
-            .then(({ ok, data }) => {
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Send Report';
-                if (ok) {
-                    toast('✅ Report sent! Thank you for your feedback.');
-                    form.reset();
-                    closeModal();
-                } else {
-                    console.error('Formspree error:', data);
-                    toast('❌ Failed to send. Please try again.');
-                }
-            })
-            .catch(err => {
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Send Report';
-                console.error('Email send error:', err);
-                toast('❌ Network error. Please try again.');
-            });
+        const version = byId('contact-version').value;
+        const body = `${message}\n\n---\nFrom: ${email}\nVersion: ${version}\nSent: ${new Date().toLocaleString()}`;
+        const mailtoUrl = `mailto:marcelaraujosantossouza19@gmail.com?subject=${encodeURIComponent('[Focus App] ' + subject)}&body=${encodeURIComponent(body)}`;
+        window.open(mailtoUrl, '_blank');
+        toast('✅ Your email client has opened — just hit Send!');
+        form.reset();
+        closeModal();
     }
 };
 
