@@ -895,6 +895,26 @@ textarea {
   padding: 6px 8px;
 }
 
+/* Habit weekly goal progress bar */
+.hweek-lbl {
+  font-size: 11px;
+  color: var(--t3);
+  margin-top: 5px;
+}
+.hweek-bar {
+  height: 4px;
+  border-radius: 999px;
+  background: var(--border);
+  overflow: hidden;
+  margin-top: 3px;
+}
+.hweek-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--primary);
+  transition: width 0.4s;
+}
+
 /* ══════════════ EXPENSES ══════════════ */
 .exp-top {
   display: grid;

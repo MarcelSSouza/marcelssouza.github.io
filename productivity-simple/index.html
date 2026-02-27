@@ -98,6 +98,12 @@
               <option value="high">High priority</option>
               <option value="overdue">Overdue</option>
             </select>
+            <select id="todo-sort" onchange="window._todos?.applySort?.()">
+              <option value="priority">Priority</option>
+              <option value="due-asc">Due ↑</option>
+              <option value="due-desc">Due ↓</option>
+              <option value="newest">Newest</option>
+            </select>
           </div>
           <div id="tlist"></div>
         </div>
@@ -168,6 +174,12 @@
               </div>
             </div>
             <div class="pdots" id="pdots"></div>
+            <div class="card psettings" style="margin-bottom:12px;margin-top:12px">
+              <div style="font-size:12px;font-weight:700;color:var(--t3);letter-spacing:0.5px;margin-bottom:8px">LINKED TASK</div>
+              <select id="pom-todo" onchange="window._pomodoro?.selectTodo?.()" style="width:100%;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:var(--r);padding:8px 10px;font-size:13px">
+                <option value="">— No task —</option>
+              </select>
+            </div>
             <div class="pcontrols">
               <button class="pside" onclick="window._pomodoro?.reset?.()">
                 ↺
@@ -293,8 +305,8 @@
           </div>
           <div class="exp-body">
             <div class="card chart-box">
-              <h4>By Category</h4>
-              <canvas id="pie-canvas" width="220" height="220"></canvas>
+              <h4>By Category <span style="font-size:10px;color:var(--t3);font-weight:400">tap to filter</span></h4>
+              <canvas id="pie-canvas" width="220" height="220" style="cursor:pointer"></canvas>
             </div>
             <div class="card chart-box">
               <h4>Last 7 days</h4>
@@ -323,6 +335,7 @@
                   placeholder="Untitled"
                   oninput="window._notes?.save?.()"
                 />
+                <button class="ico-btn" id="npin" onclick="window._notes?.pin?.()" title="Pin note">📍</button>
                 <button class="ico-btn" onclick="window._notes?.delete?.()">
                   🗑
                 </button>
@@ -363,6 +376,13 @@
                 onclick="window._grocery?.resetAll?.()"
               >
                 Uncheck all
+              </button>
+              <button
+                class="btn btn-g"
+                style="font-size: 12.5px; padding: 6px 13px"
+                onclick="window._grocery?.share?.()"
+              >
+                🔗 Share
               </button>
             </div>
           </div>
@@ -591,6 +611,19 @@
           <label>Colour</label>
           <div class="swatches" id="hswatches"></div>
         </div>
+        <div class="f">
+          <label>Weekly goal <span style="color:var(--t3);font-weight:400">(days, 0 = off)</span></label>
+          <input type="number" id="hweekly" min="0" max="7" value="0" />
+        </div>
+        <div class="f">
+          <label>Daily reminder</label>
+          <div style="display:flex;align-items:center;gap:10px">
+            <input type="time" id="hreminder-time" style="flex:1" />
+            <label style="display:flex;align-items:center;gap:5px;font-size:13px;white-space:nowrap">
+              <input type="checkbox" id="hreminder-enabled" /> On
+            </label>
+          </div>
+        </div>
         <div class="ma">
           <button class="btn btn-g" onclick="window._utils?.closeModal?.()">
             Cancel
@@ -624,6 +657,14 @@
         </div>
         <div class="f">
           <label>Due Date</label><input type="date" id="tdue" />
+        </div>
+        <div class="f">
+          <label>Repeat</label>
+          <select id="trepeat">
+            <option value="none">No repeat</option>
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+          </select>
         </div>
         <div class="ma">
           <button class="btn btn-g" onclick="window._utils?.closeModal?.()">
@@ -786,6 +827,14 @@
         <div class="f">
           <label>Due Date</label><input type="date" id="tdue-edit" />
         </div>
+        <div class="f">
+          <label>Repeat</label>
+          <select id="trepeat-edit">
+            <option value="none">No repeat</option>
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+          </select>
+        </div>
         <input type="hidden" id="tedit-id" />
         <div class="ma">
           <button class="btn btn-g" onclick="window._utils?.closeModal?.()">Cancel</button>
@@ -806,10 +855,39 @@
           <label>Colour</label>
           <div class="swatches" id="hswatches-edit"></div>
         </div>
+        <div class="f">
+          <label>Weekly goal <span style="color:var(--t3);font-weight:400">(days, 0 = off)</span></label>
+          <input type="number" id="hweekly-edit" min="0" max="7" value="0" />
+        </div>
+        <div class="f">
+          <label>Daily reminder</label>
+          <div style="display:flex;align-items:center;gap:10px">
+            <input type="time" id="hreminder-time-edit" style="flex:1" />
+            <label style="display:flex;align-items:center;gap:5px;font-size:13px;white-space:nowrap">
+              <input type="checkbox" id="hreminder-enabled-edit" /> On
+            </label>
+          </div>
+        </div>
         <input type="hidden" id="hedit-id" />
         <div class="ma">
           <button class="btn btn-g" onclick="window._utils?.closeModal?.()">Cancel</button>
           <button class="btn btn-p" onclick="window._habits?.saveEdit?.()">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- EDIT EVENT MODAL -->
+    <div id="me-edit" class="mbk">
+      <div class="modal">
+        <h3>Edit Event</h3>
+        <input type="hidden" id="eeedit-id" />
+        <div class="f"><label>Title</label><input type="text" id="eetitle" placeholder="Event name" /></div>
+        <div class="f"><label>Date</label><input type="date" id="eedate" /></div>
+        <div class="f"><label>Time (optional)</label><input type="time" id="eetime" /></div>
+        <div class="f"><label>Notes (optional)</label><textarea id="eenotes" placeholder="Optional notes…"></textarea></div>
+        <div class="ma">
+          <button class="btn btn-g" onclick="window._utils?.closeModal?.()">Cancel</button>
+          <button class="btn btn-p" onclick="window._calendar?.saveEdit?.()">Save</button>
         </div>
       </div>
     </div>

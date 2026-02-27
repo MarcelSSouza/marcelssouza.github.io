@@ -204,7 +204,14 @@ const renderSwatches = () => {
 const createHabit = () => {
     const n = byId('hname').value.trim();
     if (!n) return;
-    window._appState.habits.push({ id: uid(), name: n, color: window._appState.selColor });
+    window._appState.habits.push({
+        id: uid(),
+        name: n,
+        color: window._appState.selColor,
+        weeklyGoal: parseInt(byId('hweekly')?.value) || 0,
+        reminderTime: byId('hreminder-time')?.value || '',
+        reminderEnabled: byId('hreminder-enabled')?.checked || false
+    });
     S.set('h2', window._appState.habits);
     closeModal();
     renderHabits();
@@ -230,6 +237,9 @@ const openEditHabit = id => {
     if (!h) return;
     byId('hedit-id').value = id;
     byId('hname-edit').value = h.name;
+    byId('hweekly-edit').value = h.weeklyGoal || 0;
+    byId('hreminder-time-edit').value = h.reminderTime || '';
+    byId('hreminder-enabled-edit').checked = h.reminderEnabled || false;
     window._appState.selColor = h.color;
     renderSwatchesEdit();
     openModal('mh-edit');
@@ -256,6 +266,9 @@ const saveEditHabit = () => {
     if (!name) return;
     h.name = name;
     h.color = window._appState.selColor;
+    h.weeklyGoal = parseInt(byId('hweekly-edit')?.value) || 0;
+    h.reminderTime = byId('hreminder-time-edit')?.value || '';
+    h.reminderEnabled = byId('hreminder-enabled-edit')?.checked || false;
     S.set('h2', window._appState.habits);
     closeModal();
     renderHabits();
@@ -285,6 +298,33 @@ const hLast30 = id => {
     return out;
 };
 
+const hWeekCount = id => {
+    const mon = new Date();
+    mon.setDate(mon.getDate() - ((mon.getDay() || 7) - 1));
+    let n = 0;
+    for (let i = 0; i < 7; i++) {
+        const d = new Date(mon);
+        d.setDate(mon.getDate() + i);
+        if (window._appState.hlog[d.toISOString().slice(0, 10) + ':' + id]) n++;
+    }
+    return n;
+};
+
+const checkHabitReminders = () => {
+    if (Notification.permission !== 'granted') return;
+    const now = new Date();
+    const hhmm = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+    const notified = S.get('hrem', {});
+    window._appState.habits.forEach(h => {
+        if (!h.reminderEnabled || !h.reminderTime || h.reminderTime !== hhmm) return;
+        if (!!window._appState.hlog[today() + ':' + h.id]) return; // already checked in
+        if (notified[h.id] === today()) return; // already notified today
+        new Notification('Focus', { body: '🔥 Time to check in: ' + h.name, icon: 'favicon.svg' });
+        notified[h.id] = today();
+        localStorage.setItem('hrem', JSON.stringify(notified));
+    });
+};
+
 const renderHabits = () => {
     const state = window._appState;
     const g = byId('hgrid');
@@ -297,17 +337,23 @@ const renderHabits = () => {
         const done = !!state.hlog[today() + ':' + h.id];
         const streak = hStreak(h.id);
         const l30 = hLast30(h.id);
+        const weekDone = h.weeklyGoal > 0 ? hWeekCount(h.id) : 0;
+        const weekPct = h.weeklyGoal > 0 ? Math.min(weekDone / h.weeklyGoal * 100, 100) : 0;
         const card = document.createElement('div');
         card.className = 'card hcard';
         card.innerHTML = `
       <div class="htop">
         <div class="hdot" style="background:${h.color}"></div>
         <span class="hname">${esc(h.name)}</span>
+        ${h.reminderEnabled && h.reminderTime ? `<span style="font-size:10px;color:var(--t3);margin-right:4px">🔔${h.reminderTime}</span>` : ''}
         <button class="hchk ${done ? 'done' : ''}" style="${done ? `background:${h.color};border-color:${h.color}` : ''}" onclick="window._habits?.toggle?.('${h.id}')">${done ? '✓' : ''}</button>
       </div>
       <div class="hmeta">🔥 ${streak} day streak &nbsp;·&nbsp; ${l30.filter(Boolean).length}/30 this month</div>
       <div class="hhm">${l30.map(v => `<div class="hc" style="background:${v ? h.color : 'var(--border)'};opacity:${v ? 1 : .35}"></div>`).join('')}</div>
-      <div style="display:flex;justify-content:flex-end;gap:4px">
+      ${h.weeklyGoal > 0 ? `
+      <div class="hweek-lbl">This week: ${weekDone} / ${h.weeklyGoal}</div>
+      <div class="hweek-bar"><div class="hweek-fill" style="width:${weekPct}%;background:${h.color}"></div></div>` : ''}
+      <div style="display:flex;justify-content:flex-end;gap:4px;margin-top:6px">
         <button class="ico-btn" onclick="window._habits?.edit?.('${h.id}')" title="Edit">✎</button>
         <button class="ico-btn" onclick="window._habits?.delete?.('${h.id}')">🗑</button>
       </div>`;
@@ -337,12 +383,14 @@ const createTodo = () => {
         title: t,
         priority: byId('tpri').value,
         due: byId('tdue').value || null,
+        repeat: byId('trepeat')?.value || 'none',
         done: false,
         at: Date.now()
     });
     S.set('t2', window._appState.todos);
     closeModal();
     renderTodos();
+    pomUpdateTodoDropdown();
     toast('Task added ✅');
 };
 
@@ -352,6 +400,7 @@ const toggleTodo = id => {
         t.done = !t.done;
         S.set('t2', window._appState.todos);
         renderTodos();
+        pomUpdateTodoDropdown();
     }
 };
 
@@ -359,6 +408,7 @@ const deleteTodo = id => {
     window._appState.todos = window._appState.todos.filter(x => x.id !== id);
     S.set('t2', window._appState.todos);
     renderTodos();
+    pomUpdateTodoDropdown();
 };
 
 const openEditTodo = id => {
@@ -368,6 +418,7 @@ const openEditTodo = id => {
     byId('ttitle-edit').value = t.title;
     byId('tpri-edit').value = t.priority || 'none';
     byId('tdue-edit').value = t.due || '';
+    byId('trepeat-edit').value = t.repeat || 'none';
     openModal('mt-edit');
 };
 
@@ -380,10 +431,31 @@ const saveEditTodo = () => {
     t.title = title;
     t.priority = byId('tpri-edit').value;
     t.due = byId('tdue-edit').value || null;
+    t.repeat = byId('trepeat-edit').value || 'none';
     S.set('t2', window._appState.todos);
     closeModal();
     renderTodos();
+    pomUpdateTodoDropdown();
     toast('Task updated ✅');
+};
+
+const processDueRecurring = () => {
+    const state = window._appState;
+    let changed = false;
+    state.todos.forEach(t => {
+        if (t.repeat && t.repeat !== 'none' && t.done && t.due && t.due < today()) {
+            const d = new Date(t.due + 'T00:00:00');
+            const days = t.repeat === 'weekly' ? 7 : 1;
+            // Advance due date until it's today or future
+            while (t.due < today()) {
+                d.setDate(d.getDate() + days);
+                t.due = d.toISOString().slice(0, 10);
+            }
+            t.done = false;
+            changed = true;
+        }
+    });
+    if (changed) S.set('t2', state.todos);
 };
 
 const dueBadge = (due, done) => {
@@ -397,12 +469,14 @@ const dueBadge = (due, done) => {
 
 const todoSearch = () => renderTodos();
 const todoApplyFilter = () => renderTodos();
+const todoApplySort = () => renderTodos();
 
 const renderTodos = () => {
     const state = window._appState;
     const el = byId('tlist');
     const q = (byId('todo-search')?.value || '').toLowerCase();
     const filter = byId('todo-filter')?.value || 'all';
+    const sortBy = byId('todo-sort')?.value || 'priority';
 
     if (!state.todos.length) {
         el.innerHTML = `<div class="empty"><span class="empty-ic">✅</span>No tasks yet.<br>Hit <strong>+</strong> to add one.</div>`;
@@ -426,9 +500,18 @@ const renderTodos = () => {
         return;
     }
 
+    // Sort (done items always last)
+    const sortFn = sortBy === 'due-asc'
+        ? (a, b) => (a.due || '9999') < (b.due || '9999') ? -1 : 1
+        : sortBy === 'due-desc'
+            ? (a, b) => (a.due || '') > (b.due || '') ? -1 : 1
+            : sortBy === 'newest'
+                ? (a, b) => b.at - a.at
+                : (a, b) => (po[a.priority] || 3) - (po[b.priority] || 3);
+
     const sorted = [
-        ...list.filter(x => !x.done).sort((a, b) => (po[a.priority] || 3) - (po[b.priority] || 3)),
-        ...list.filter(x => x.done)
+        ...list.filter(x => !x.done).sort(sortFn),
+        ...list.filter(x => x.done).sort(sortFn)
     ];
     el.innerHTML = sorted.map(t => `
     <div class="ti">
@@ -437,13 +520,15 @@ const renderTodos = () => {
       <div class="tmeta">
         ${t.priority !== 'none' ? `<span class="chip c${t.priority[0]}">${t.priority}</span>` : ''}
         ${dueBadge(t.due, t.done)}
+        ${t.repeat && t.repeat !== 'none' ? `<span class="chip" style="background:var(--pdim);color:var(--primary)">🔁 ${t.repeat}</span>` : ''}
+        ${t.pomCount ? `<span class="chip" style="background:var(--pdim);color:var(--primary)">🍅×${t.pomCount}</span>` : ''}
       </div>
       <button class="ico-btn" onclick="window._todos?.edit?.('${t.id}')" title="Edit">✎</button>
       <button class="ico-btn" onclick="window._todos?.delete?.('${t.id}')">×</button>
     </div>`).join('');
 };
 
-window._todos = { create: createTodo, toggle: toggleTodo, delete: deleteTodo, edit: openEditTodo, saveEdit: saveEditTodo, search: todoSearch, applyFilter: todoApplyFilter };
+window._todos = { create: createTodo, toggle: toggleTodo, delete: deleteTodo, edit: openEditTodo, saveEdit: saveEditTodo, search: todoSearch, applyFilter: todoApplyFilter, applySort: todoApplySort };
 
 byId('ttitle').addEventListener('keydown', e => {
     if (e.key === 'Enter') createTodo();
@@ -488,6 +573,35 @@ const deleteEvent = id => {
     window._appState.calEvents = window._appState.calEvents.filter(e => e.id !== id);
     S.set('ev2', window._appState.calEvents);
     renderCalendar();
+};
+
+const openEditEvent = id => {
+    const e = window._appState.calEvents.find(x => x.id === id);
+    if (!e) return;
+    byId('eeedit-id').value = id;
+    byId('eetitle').value = e.title;
+    byId('eedate').value = e.date;
+    byId('eetime').value = e.time || '';
+    byId('eenotes').value = e.evnotes || '';
+    openModal('me-edit');
+};
+
+const saveEditEvent = () => {
+    const id = byId('eeedit-id').value;
+    const e = window._appState.calEvents.find(x => x.id === id);
+    if (!e) return;
+    const title = byId('eetitle').value.trim();
+    if (!title) { byId('eetitle').style.borderColor = 'var(--red)'; byId('eetitle').focus(); return; }
+    byId('eetitle').style.borderColor = '';
+    e.title = title;
+    e.date = byId('eedate').value;
+    e.time = byId('eetime').value || null;
+    e.evnotes = byId('eenotes').value.trim() || null;
+    S.set('ev2', window._appState.calEvents);
+    closeModal();
+    window._appState.calSel = e.date;
+    renderCalendar();
+    toast('Event updated 📅');
 };
 
 const calMove = d => {
@@ -535,6 +649,7 @@ const showDetail = ds => {
         html += `<div class="det-row">
       <div class="det-dot" style="background:var(--primary)"></div>
       <span style="flex:1">${e.time ? `<strong>${esc(e.time)}</strong> ` : ''}${esc(e.title)}${e.evnotes ? `<br><small style="color:var(--t3)">${esc(e.evnotes)}</small>` : ''}</span>
+      <button class="ico-btn" onclick="window._calendar?.editEvent?.('${e.id}')" title="Edit">✎</button>
       <button class="ico-btn" onclick="window._calendar?.deleteEvent?.('${e.id}')">×</button>
     </div>`;
     });
@@ -587,11 +702,17 @@ window._calendar = {
     goToday: calGoToday,
     click: calClick,
     createEvent,
-    deleteEvent
+    deleteEvent,
+    editEvent: openEditEvent,
+    saveEdit: saveEditEvent
 };
 
 byId('etitle').addEventListener('keydown', e => {
     if (e.key === 'Enter') createEvent();
+});
+
+byId('eetitle').addEventListener('keydown', e => {
+    if (e.key === 'Enter') saveEditEvent();
 });
 
 // ══════════════════════════════════════════════════════════
@@ -610,6 +731,7 @@ let pMode = 'work';
 let pSec = pCfg.work * 60;
 let pTot = pCfg.work * 60;
 let pRun = false;
+let _pomLinkedTodoId = null;
 let pInt = null;
 let pSess = 0;
 
@@ -751,11 +873,31 @@ const pomSkip = () => {
     }
 };
 
+const pomUpdateTodoDropdown = () => {
+    const sel = byId('pom-todo');
+    if (!sel) return;
+    const active = window._appState.todos.filter(t => !t.done);
+    sel.innerHTML = `<option value="">— No task —</option>` +
+        active.map(t => `<option value="${t.id}"${t.id === _pomLinkedTodoId ? ' selected' : ''}>${esc(t.title)}</option>`).join('');
+};
+
+const pomSelectTodo = () => {
+    _pomLinkedTodoId = byId('pom-todo')?.value || null;
+};
+
 const pomTick = () => {
     if (pSec <= 0) {
         pomStop();
         if (Notification.permission === 'granted')
             new Notification(pMode === 'work' ? '⏰ Focus done! Take a break.' : '💪 Break over! Time to focus.');
+        // Log pomodoro to linked todo
+        if (pMode === 'work' && _pomLinkedTodoId) {
+            const t = window._appState.todos.find(x => x.id === _pomLinkedTodoId);
+            if (t) {
+                t.pomCount = (t.pomCount || 0) + 1;
+                S.set('t2', window._appState.todos);
+            }
+        }
         pomSkip();
         return;
     }
@@ -791,7 +933,7 @@ const pomApplySettings = () => {
 if (Notification && Notification.permission === 'default')
     Notification.requestPermission();
 
-window._pomodoro = { setMode: pomSetMode, toggle: pomToggle, reset: pomReset, skip: pomSkip, applySettings: pomApplySettings, setNoise: noiseSetType, setNoiseVol: noiseSetVol };
+window._pomodoro = { setMode: pomSetMode, toggle: pomToggle, reset: pomReset, skip: pomSkip, applySettings: pomApplySettings, setNoise: noiseSetType, setNoiseVol: noiseSetVol, selectTodo: pomSelectTodo, refreshTodos: pomUpdateTodoDropdown };
 
 // ══════════════════════════════════════════════════════════
 // EXPENSES
@@ -820,11 +962,14 @@ const deleteExpense = id => {
     renderExpenses();
 };
 
+let _pieSegments = [];
+
 const drawPie = () => {
     const canvas = byId('pie-canvas');
     const ctx = canvas.getContext('2d');
     const W = canvas.width, H = canvas.height;
     ctx.clearRect(0, 0, W, H);
+    _pieSegments = [];
     const agg = {};
     window._appState.expenses.forEach(x => {
         agg[x.cat] = (agg[x.cat] || 0) + x.amount;
@@ -836,12 +981,18 @@ const drawPie = () => {
     }
     const total = entries.reduce((s, [, v]) => s + v, 0);
     const cx = W / 2, cy = H / 2, r = Math.min(W, H) / 2 - 20;
+    const activeFilter = window._appState.expFilter;
     let angle = -Math.PI / 2;
     entries.forEach(([cat, val]) => {
         const slice = val / total * Math.PI * 2;
+        _pieSegments.push({ cat, start: angle, end: angle + slice });
         ctx.beginPath(); ctx.moveTo(cx, cy);
         ctx.arc(cx, cy, r, angle, angle + slice); ctx.closePath();
-        ctx.fillStyle = CAT_COLORS[cat] || '#9ca3af'; ctx.fill();
+        const isActive = activeFilter === 'All' || activeFilter === cat;
+        ctx.fillStyle = CAT_COLORS[cat] || '#9ca3af';
+        ctx.globalAlpha = isActive ? 1 : 0.4;
+        ctx.fill();
+        ctx.globalAlpha = 1;
         const mid = angle + slice / 2;
         const lx = cx + Math.cos(mid) * (r * .65);
         const ly = cy + Math.sin(mid) * (r * .65);
@@ -972,7 +1123,7 @@ byId('xdesc').addEventListener('keydown', e => {
 // ══════════════════════════════════════════════════════════
 
 const newNote = () => {
-    const n = { id: uid(), title: '', body: '', updatedAt: Date.now() };
+    const n = { id: uid(), title: '', body: '', updatedAt: Date.now(), pinned: false };
     window._appState.notes.unshift(n);
     S.set('nt2', window._appState.notes);
     window._appState.activeNote = n.id;
@@ -1012,7 +1163,21 @@ const openNoteEditor = n => {
     byId('ntitle').value = n.title || '';
     byId('nbody').value = n.body || '';
     updateNoteMeta(n);
+    const pinBtn = byId('npin');
+    if (pinBtn) pinBtn.textContent = n.pinned ? '📌' : '📍';
     byId('nbody').focus();
+};
+
+const togglePinNote = () => {
+    const state = window._appState;
+    if (!state.activeNote) return;
+    const n = state.notes.find(x => x.id === state.activeNote);
+    if (!n) return;
+    n.pinned = !n.pinned;
+    S.set('nt2', state.notes);
+    const pinBtn = byId('npin');
+    if (pinBtn) pinBtn.textContent = n.pinned ? '📌' : '📍';
+    renderNotes(false);
 };
 
 const showNoteEditor = show => {
@@ -1051,7 +1216,8 @@ const renderNotes = (resetEditor = true) => {
         return;
     }
 
-    let sorted = [...state.notes].sort((a, b) => b.updatedAt - a.updatedAt);
+    // Pinned first, then by updatedAt
+    let sorted = [...state.notes].sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0) || b.updatedAt - a.updatedAt);
     if (q) sorted = sorted.filter(n => n.title.toLowerCase().includes(q) || (n.body || '').toLowerCase().includes(q));
 
     if (!sorted.length) {
@@ -1062,14 +1228,14 @@ const renderNotes = (resetEditor = true) => {
     list.innerHTML = sorted.map(n => `
     <div class="note-item${n.id === state.activeNote ? ' active' : ''}" onclick="window._notes?.select?.('${n.id}')">
       <div class="note-title-row">
-        <span class="note-item-title">${esc(n.title) || 'Untitled'}</span>
+        <span class="note-item-title">${n.pinned ? '📌 ' : ''}${esc(n.title) || 'Untitled'}</span>
         <span class="note-item-date">${shortDate(n.updatedAt)}</span>
       </div>
       <div class="note-item-preview">${esc((n.body || '').slice(0, 60)) || 'No content'}</div>
     </div>`).join('');
 };
 
-window._notes = { save: noteSave, delete: noteDelete, select: selectNote, search: noteSearch };
+window._notes = { save: noteSave, delete: noteDelete, select: selectNote, search: noteSearch, pin: togglePinNote };
 
 // ══════════════════════════════════════════════════════════
 // GROCERY
@@ -1165,7 +1331,41 @@ const renderGrocery = () => {
     }).join('');
 };
 
-window._grocery = { create: createGrocery, toggle: toggleGrocery, delete: deleteGrocery, clearDone: groceryClearDone, resetAll: groceryResetAll };
+const groceryShare = () => {
+    const encoded = btoa(encodeURIComponent(JSON.stringify(window._appState.grocery)));
+    const url = window.location.origin + window.location.pathname + '?share-grocery=' + encoded;
+    navigator.clipboard.writeText(url).then(() => {
+        toast('📋 Share link copied to clipboard!');
+    }).catch(() => {
+        prompt('Copy this link to share your grocery list:', url);
+    });
+};
+
+const checkGroceryShare = () => {
+    const param = new URLSearchParams(window.location.search).get('share-grocery');
+    if (!param) return;
+    try {
+        const items = JSON.parse(decodeURIComponent(atob(param)));
+        window._appState.grocery = items;
+        window._isGroceryShare = true;
+        // Hide FAB and show read-only banner
+        byId('fab').style.display = 'none';
+        const banner = document.createElement('div');
+        banner.id = 'share-banner';
+        banner.style.cssText = 'background:var(--pdim);color:var(--primary);font-size:13px;font-weight:600;padding:8px 16px;border-radius:var(--r);margin-bottom:14px;text-align:center;';
+        banner.textContent = '👁 View only — this is a shared grocery list';
+        const page = byId('page-grocery');
+        const ph = page.querySelector('.ph');
+        ph.insertAdjacentElement('afterend', banner);
+        // Navigate to grocery page
+        window._appState.page = 'grocery';
+        showPage('grocery', render);
+    } catch (e) {
+        toast('❌ Invalid share link');
+    }
+};
+
+window._grocery = { create: createGrocery, toggle: toggleGrocery, delete: deleteGrocery, clearDone: groceryClearDone, resetAll: groceryResetAll, share: groceryShare };
 
 byId('gname').addEventListener('keydown', e => {
     if (e.key === 'Enter') createGrocery();
@@ -1342,8 +1542,26 @@ byId('note-editor').style.display = 'none';
 darkMode.apply();
 settings.updateUI();
 initFirebase();
+processDueRecurring();
+checkGroceryShare();
 
 // Expose modules to window for HTML onclick handlers
 window._settings = settings;
 window._contactForm = contactForm;
 render();
+pomUpdateTodoDropdown();
+setInterval(checkHabitReminders, 60000);
+
+// Pie chart click-to-filter
+byId('pie-canvas').addEventListener('click', e => {
+    const rect = e.target.getBoundingClientRect();
+    const scaleX = e.target.width / rect.width;
+    const scaleY = e.target.height / rect.height;
+    const x = (e.clientX - rect.left) * scaleX;
+    const y = (e.clientY - rect.top) * scaleY;
+    const cx = e.target.width / 2, cy = e.target.height / 2;
+    let a = Math.atan2(y - cy, x - cx);
+    if (a < -Math.PI / 2) a += 2 * Math.PI;
+    const seg = _pieSegments.find(s => a >= s.start && a < s.end);
+    if (seg) expSetFilter(seg.cat === window._appState.expFilter ? 'All' : seg.cat);
+});
