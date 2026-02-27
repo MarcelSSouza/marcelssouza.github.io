@@ -1258,7 +1258,7 @@ window._notes = { save: noteSave, delete: noteDelete, select: selectNote, search
 // GAMES BACKLOG
 // ══════════════════════════════════════════════════════════
 
-const RAWG_KEY = 'a0d9375a85254c8fbe26e0f9a052dd55'; // free public key
+const RAWG_KEY = '55e6610953c149e9817cf07d2fc91da3'; // free public key
 const GAME_STATUSES = {
     wishlist:  { label: '🕹 Want to Play', color: '#06b6d4' },
     playing:   { label: '▶ Playing',       color: '#5b6ef5' },
