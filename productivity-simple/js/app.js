@@ -62,12 +62,56 @@ const darkMode = {
 };
 
 // ══════════════════════════════════════════════════════════
+// MOBILE NAVIGATION - HAMBURGER MENU
+// ══════════════════════════════════════════════════════════
+
+const nav = {
+    toggle() {
+        const navEl = byId('nav');
+        const hamburger = byId('hamburger');
+
+        if (navEl.classList.contains('mobile-open')) {
+            navEl.classList.remove('mobile-open');
+            hamburger.classList.remove('open');
+        } else {
+            navEl.classList.add('mobile-open');
+            hamburger.classList.add('open');
+        }
+    },
+
+    close() {
+        const navEl = byId('nav');
+        const hamburger = byId('hamburger');
+        navEl.classList.remove('mobile-open');
+        hamburger.classList.remove('open');
+    }
+};
+
+// Close mobile menu when a nav button is clicked
+queryAll('.nb').forEach(btn => {
+    btn.addEventListener('click', () => nav.close());
+});
+
+// Close mobile menu when clicking outside (on overlay)
+document.addEventListener('click', (e) => {
+    const nav = byId('nav');
+    const hamburger = byId('hamburger');
+    if (!nav?.contains(e.target) && !hamburger?.contains(e.target)) {
+        if (nav?.classList.contains('mobile-open')) {
+            nav.classList.remove('mobile-open');
+            hamburger.classList.remove('open');
+        }
+    }
+});
+
+// ══════════════════════════════════════════════════════════
 // UTILITIES - EXPORT TO WINDOW
 // ══════════════════════════════════════════════════════════
 
 window._utils = { closeModal, toast };
 window._darkMode = darkMode;
 window._auth = { action: authAction };
+window._nav = nav;
 
 // ══════════════════════════════════════════════════════════
 // NAVIGATION & RENDERING
@@ -91,6 +135,8 @@ queryAll('.nb').forEach(btn => {
         const page = btn.dataset.page;
         window._appState.page = page;
         showPage(page, render);
+        // Close mobile menu after navigation
+        nav.close();
     });
 });
 
