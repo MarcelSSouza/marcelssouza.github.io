@@ -62,7 +62,7 @@ export const initFirebase = () => {
 
         const fbApp = firebase.initializeApp({
             apiKey: "AIzaSyC5r6j4k3Nxduv4V4fEzjRrcV3_y3ohkrQ",
-            authDomain: "focus-81bf0.firebaseapp.com",
+            authDomain: "focus-81bf0.web.app",
             projectId: "focus-81bf0",
             storageBucket: "focus-81bf0.firebasestorage.app",
             messagingSenderId: "216712938115",
@@ -193,25 +193,32 @@ export const authAction = async () => {
             console.log('✅ Signed in as:', result.user.email);
             _currentUser = result.user;
 
-            // IMPORTANT: After signing in, migrate local data to their Google account
-            console.log('🔄 Migrating local data to Google account...');
-            const state = window._appState;
-
-            // Save current local state to their Firebase account
-            await _db.collection('users').doc(_currentUser.uid).set({
-                habits: state.habits,
-                hlog: state.hlog,
-                todos: state.todos,
-                calEvents: state.calEvents,
-                expenses: state.expenses,
-                notes: state.notes,
-                grocery: state.grocery
-            });
-            console.log('✓ Local data migrated to Firebase');
-
             updateAuthUI(result.user);
 
-            // Load user data from cloud
+            // Check if user already has cloud data
+            const existing = await _db.collection('users').doc(_currentUser.uid).get();
+
+            if (existing.exists) {
+                // Cloud data exists → load it, never overwrite
+                console.log('☁️ Cloud data found, loading from Firestore...');
+            } else {
+                // First time sign-in → migrate local data up to cloud
+                console.log('🆕 New account, migrating local data to Firestore...');
+                const state = window._appState;
+                await _db.collection('users').doc(_currentUser.uid).set({
+                    habits: state.habits,
+                    hlog: state.hlog,
+                    todos: state.todos,
+                    calEvents: state.calEvents,
+                    expenses: state.expenses,
+                    notes: state.notes,
+                    grocery: state.grocery,
+                    games: state.games
+                });
+                console.log('✓ Local data migrated to Firestore');
+            }
+
+            // Set up real-time listener (loads data and keeps it in sync)
             await dbLoad();
 
             // Force render to update UI with cloud data
@@ -280,7 +287,8 @@ export const dbSave = () => {
             calEvents: state.calEvents,
             expenses: state.expenses,
             notes: state.notes,
-            grocery: state.grocery
+            grocery: state.grocery,
+            games: state.games
         }).then(() => {
             console.log('✓ Saved to Firebase successfully');
         }).catch(e => {
@@ -349,6 +357,10 @@ export const dbLoad = async () => {
                     if (d.grocery !== undefined) {
                         state.grocery = d.grocery;
                         localStorage.setItem('gr2', JSON.stringify(d.grocery));
+                    }
+                    if (d.games !== undefined) {
+                        state.games = d.games;
+                        localStorage.setItem('gm2', JSON.stringify(d.games));
                     }
 
                     // Re-render with updated data
