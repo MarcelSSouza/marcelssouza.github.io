@@ -1540,32 +1540,6 @@ canvas {
     padding-left: 48px;
   }
 
-  /* tighten layout on very narrow screens */
-  @media (max-width: 480px) {
-    main {
-      padding: 12px 10px;
-      padding-top: 60px;
-    }
-    .ph h2 {
-      font-size: 18px;
-    }
-  }
-
-  .exp-body {
-    grid-template-columns: 1fr;
-  }
-
-  .notes-layout {
-    grid-template-columns: 1fr;
-  }
-
-  .notes-list {
-    display: none;
-  }
-
-  .notes-layout.list-open .notes-list {
-    display: block;
-  }
 }
 
 /* Add overlay when menu is open */
@@ -2005,6 +1979,169 @@ canvas {
 /* ════════════════════════════════════════════════════════ */
 
 @media (max-width: 720px) {
+  /* ── Global ── */
+  /* Prevent iOS zoom on input focus */
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+
+  /* Larger tap targets for all buttons */
+  .btn {
+    padding: 10px 18px;
+    font-size: 14px;
+  }
+  .ico-btn {
+    width: 38px;
+    height: 38px;
+  }
+
+  /* Modal: slide up from bottom on mobile */
+  .mbk {
+    align-items: flex-end;
+  }
+  .modal {
+    max-width: 100%;
+    border-radius: var(--rl) var(--rl) 0 0;
+    padding: 20px 18px 32px;
+    max-height: 92vh;
+    overflow-y: auto;
+  }
+
+  /* ── Page header ── */
+  .ph {
+    margin-bottom: 16px;
+  }
+  .ph h2 {
+    font-size: 20px;
+  }
+
+  /* ── Habits ── */
+  #hgrid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .hcard {
+    padding: 14px;
+  }
+
+  /* ── Todos ── */
+  .titem {
+    padding: 12px 14px;
+    gap: 10px;
+  }
+  .tmeta {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  /* ── Calendar ── */
+  .cc {
+    min-height: 52px;
+    padding: 4px 3px;
+  }
+  .cnum {
+    font-size: 11px;
+  }
+  .ce {
+    font-size: 9px;
+    padding: 1px 3px;
+  }
+  .cc.today .cnum {
+    width: 18px;
+    height: 18px;
+    font-size: 10px;
+  }
+  .det-row {
+    font-size: 13px;
+    padding: 10px 0;
+  }
+
+  /* ── Pomodoro ── */
+  .pom-wrap {
+    gap: 18px;
+  }
+  .ring-wrap {
+    width: 180px;
+    height: 180px;
+  }
+  .psvg {
+    width: 180px;
+    height: 180px;
+  }
+  .ptime {
+    font-size: 38px;
+  }
+  .pbig {
+    width: 60px;
+    height: 60px;
+    font-size: 22px;
+  }
+  .pside {
+    width: 46px;
+    height: 46px;
+    font-size: 18px;
+  }
+  .psettings {
+    padding: 14px;
+  }
+  .noise-btn {
+    padding: 8px 16px;
+    font-size: 13px;
+  }
+
+  /* ── Expenses ── */
+  .exp-top {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .exp-top .exp-stat:last-child {
+    grid-column: 1 / -1;
+  }
+  .exp-stat {
+    padding: 14px 16px;
+  }
+  .exp-stat .val {
+    font-size: 22px;
+  }
+  .exp-body {
+    grid-template-columns: 1fr;
+  }
+  .exp-row {
+    padding: 12px 14px;
+    font-size: 14px;
+  }
+  .exp-ico {
+    width: 36px;
+    height: 36px;
+    font-size: 18px;
+  }
+
+  /* ── Notes ── */
+  .notes-layout {
+    grid-template-columns: 1fr;
+    height: calc(100vh - 120px);
+  }
+  .notes-list {
+    display: none;
+  }
+  .notes-layout.list-open .notes-list {
+    display: block;
+  }
+  .note-editor-top {
+    gap: 6px;
+  }
+  #note-title {
+    font-size: 16px;
+  }
+
+  /* ── Grocery ── */
+  .gr-item {
+    padding: 12px 14px;
+    gap: 10px;
+  }
+
+  /* ── Games ── */
   .games-stats {
     gap: 6px;
   }
@@ -2015,57 +2152,135 @@ canvas {
     width: 58px;
     height: 78px;
   }
+  .game-card {
+    padding: 12px;
+    gap: 12px;
+  }
+  .game-title {
+    font-size: 14px;
+  }
+  .game-actions {
+    margin-top: 6px;
+  }
+  .game-status-select {
+    padding: 6px 8px;
+    font-size: 13px;
+  }
 
+  /* ── Settings ── */
   .settings-content {
     padding: 12px;
     gap: 12px;
   }
-
   .settings-content .card {
     padding: 14px;
   }
-
   .settings-row {
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
   }
-
   .dark-btn-settings {
     width: 100%;
   }
 
+  /* ── QA ── */
   .qa-content {
     padding: 12px;
     gap: 10px;
   }
-
   .qa-item {
     border-radius: 6px;
   }
-
   .qa-item summary {
     padding: 12px;
     font-size: 14px;
   }
-
   .qa-item p {
     padding: 10px 12px;
     font-size: 13px;
   }
 
+  /* ── Contact ── */
   .contact-form {
     gap: 12px;
   }
-
   .contact-form .f {
     gap: 5px;
   }
 
-  .contact-form select,
-  .contact-form textarea,
-  .contact-form input {
-    font-size: 16px;
+  /* ── Toast ── */
+  #toast {
+    bottom: 80px;
+    right: 14px;
+    left: 14px;
+    text-align: center;
+  }
+
+  /* ── FAB ── */
+  .fab {
+    bottom: 20px;
+    right: 16px;
+    width: 52px;
+    height: 52px;
+    font-size: 24px;
+  }
+
+  /* ── Filter chips: scrollable row on mobile ── */
+  .filter-row {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+    margin-bottom: 12px;
+    gap: 6px;
+    scrollbar-width: none;
+  }
+  .filter-row::-webkit-scrollbar { display: none; }
+  .fchip {
+    flex-shrink: 0;
+    padding: 6px 14px;
+    font-size: 13px;
+  }
+
+  /* ── Games tabs: scrollable ── */
+  .games-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+  }
+  .games-tabs::-webkit-scrollbar { display: none; }
+  .games-tab {
+    flex-shrink: 0;
+    padding: 7px 14px;
+    font-size: 13px;
+  }
+}
+
+/* ── Extra small (≤ 480px) ── */
+@media (max-width: 480px) {
+  main {
+    padding: 12px 10px;
+    padding-top: 60px;
+  }
+  .ph h2 {
+    font-size: 18px;
+  }
+  .exp-stat .val {
+    font-size: 19px;
+  }
+  .ring-wrap {
+    width: 160px;
+    height: 160px;
+  }
+  .psvg {
+    width: 160px;
+    height: 160px;
+  }
+  .ptime {
+    font-size: 34px;
   }
 }
 

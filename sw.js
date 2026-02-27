@@ -1,4 +1,4 @@
-const CACHE = 'focus-v2';
+const CACHE = 'focus-v3';
 
 // Files to cache for offline use
 const PRECACHE = [
