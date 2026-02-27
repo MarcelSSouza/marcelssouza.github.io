@@ -1374,6 +1374,10 @@ canvas {
 }
 
 @media (max-width: 720px) {
+  .hamburger {
+    display: flex;
+  }
+
   /* mobile nav should occupy full screen when visible */
   nav {
     width: 100%;
