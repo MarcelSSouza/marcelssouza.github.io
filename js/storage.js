@@ -297,25 +297,12 @@ export const dbSave = (field, value) => {
 
         console.log('💾 Saving to Firebase (fields):', Object.keys(updates));
 
-        _db.collection('users').doc(_currentUser.uid).update(updates)
+        // Use set with merge:true — creates doc if missing, updates only specified fields if it exists
+        _db.collection('users').doc(_currentUser.uid).set(updates, { merge: true })
             .then(() => {
                 console.log('✓ Saved to Firebase successfully');
             })
             .catch(e => {
-                // If document doesn't exist yet, fall back to set()
-                if (e.code === 'not-found') {
-                    const state = window._appState;
-                    return _db.collection('users').doc(_currentUser.uid).set({
-                        habits: state.habits,
-                        hlog: state.hlog,
-                        todos: state.todos,
-                        calEvents: state.calEvents,
-                        expenses: state.expenses,
-                        notes: state.notes,
-                        grocery: state.grocery,
-                        games: state.games
-                    });
-                }
                 console.error('Firestore save failed:', e);
             });
     }, 800);
@@ -396,7 +383,17 @@ export const dbLoad = async () => {
                     _isLoadingFromFirebase = false;
                 } else {
                     console.log('No cloud data found, creating new document');
-                    dbSave();
+                    const state = window._appState;
+                    _db.collection('users').doc(_currentUser.uid).set({
+                        habits: state.habits,
+                        hlog: state.hlog,
+                        todos: state.todos,
+                        calEvents: state.calEvents,
+                        expenses: state.expenses,
+                        notes: state.notes,
+                        grocery: state.grocery,
+                        games: state.games
+                    }).catch(e => console.error('Firestore create failed:', e));
                 }
             },
             (error) => {
