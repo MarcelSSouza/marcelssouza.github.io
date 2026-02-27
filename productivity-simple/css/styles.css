@@ -1432,10 +1432,15 @@ canvas {
     padding-top: 60px;
   }
 
+  .ph {
+    padding-left: 48px;
+  }
+
   /* tighten layout on very narrow screens */
   @media (max-width: 480px) {
     main {
       padding: 12px 10px;
+      padding-top: 60px;
     }
     .ph h2 {
       font-size: 18px;
