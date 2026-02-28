@@ -31,9 +31,11 @@ productivity-simple/
 
 ## Getting Started
 
-1. Open `index.html` in a modern web browser
-2. Data is automatically saved to localStorage
-3. Sign in with Google to sync data across devices
+1. Copy `.env.example` to `.env` and add your API keys (see [SECRETS.md](SECRETS.md))
+2. Run `npm run build` then `firebase serve` (or open `dist/index.html` in a browser)
+3. Data is saved to localStorage; sign in with Google to sync across devices
+
+> **Security**: API keys and tokens are kept out of source via env vars. Add GitHub Secrets for CI; see [SECRETS.md](SECRETS.md).
 
 ## Firebase Setup
 

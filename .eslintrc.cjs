@@ -11,5 +11,5 @@ module.exports = {
     globals: {
         firebase: 'readonly',
     },
-    ignorePatterns: ['node_modules/', 'dist/', 'sw.js'],
+    ignorePatterns: ['node_modules/', 'dist/', 'sw.js', 'scripts/'],
 };

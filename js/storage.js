@@ -71,12 +71,12 @@ export const initFirebase = () => {
         }
 
         firebase.initializeApp({
-            apiKey: 'AIzaSyC5r6j4k3Nxduv4V4fEzjRrcV3_y3ohkrQ',
-            authDomain: 'focus-81bf0.firebaseapp.com',
-            projectId: 'focus-81bf0',
-            storageBucket: 'focus-81bf0.firebasestorage.app',
-            messagingSenderId: '216712938115',
-            appId: '1:216712938115:web:88ec80640f96b1dcfe11b6',
+            apiKey: '__FIREBASE_API_KEY__',
+            authDomain: '__FIREBASE_AUTH_DOMAIN__',
+            projectId: '__FIREBASE_PROJECT_ID__',
+            storageBucket: '__FIREBASE_STORAGE_BUCKET__',
+            messagingSenderId: '__FIREBASE_MESSAGING_SENDER_ID__',
+            appId: '__FIREBASE_APP_ID__',
         });
 
         _db = firebase.firestore();

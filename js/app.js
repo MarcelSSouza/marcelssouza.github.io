@@ -1445,7 +1445,7 @@ window._notes = {
 // GAMES BACKLOG
 // ══════════════════════════════════════════════════════════
 
-const RAWG_KEY = '55e6610953c149e9817cf07d2fc91da3'; // free public key
+const RAWG_KEY = '__RAWG_API_KEY__';
 const GAME_STATUSES = {
     wishlist: { label: '🕹 Want to Play', color: '#06b6d4' },
     playing: { label: '▶ Playing', color: '#5b6ef5' },
@@ -2031,7 +2031,7 @@ const contactForm = {
 
         const version = byId('contact-version').value;
         const body = `${message}\n\n---\nFrom: ${email}\nVersion: ${version}\nSent: ${new Date().toLocaleString()}`;
-        const mailtoUrl = `mailto:marcelaraujosantossouza19@gmail.com?subject=${encodeURIComponent('[Focus App] ' + subject)}&body=${encodeURIComponent(body)}`;
+        const mailtoUrl = `mailto:__CONTACT_EMAIL__?subject=${encodeURIComponent('[Focus App] ' + subject)}&body=${encodeURIComponent(body)}`;
         window.open(mailtoUrl, '_blank');
         toast('✅ Your email client has opened — just hit Send!');
         form.reset();

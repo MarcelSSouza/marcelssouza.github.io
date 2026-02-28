@@ -1,6 +1,6 @@
 {
     "hosting": {
-        "public": ".",
+        "public": "dist",
         "ignore": ["firebase.json", ".firebaserc", ".git", ".gitignore", "README.md", "STRUCTURE.md", "node_modules"],
         "headers": [
             {
